@@ -215,8 +215,8 @@ CLHueLetterIndexPlus  = CtrClockwiseHue(2)	;
 
 % Express the two bounding Munsell colours in ColorLab Munsell vector format, and
 % in ASTM format
-CLMVMinus    = [ClockwiseHue(1), Value, Chroma, ClockwiseHue(2)]			;
-CLMVPlus     = [CtrClockwiseHue(1), Value, Chroma, CtrClockwiseHue(2)]		;
+CLMVMinus    = [MunsellHueNumberMinus, Value, Chroma, CLHueLetterIndexMinus]			;
+CLMVPlus     = [MunsellHueNumberPlus, Value, Chroma, CLHueLetterIndexPlus]		;
 
 % Find the achromatic point, to be used as the center of polar coordinates
 [xGrey yGrey YGrey StatusCode] = MunsellToxyYfromExtrapolatedRenotation([Value]);
