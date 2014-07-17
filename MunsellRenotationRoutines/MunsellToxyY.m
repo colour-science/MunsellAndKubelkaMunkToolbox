@@ -194,9 +194,11 @@ end
 % Additional error check added by Paul Centore on April 26, 2014
 % Check that the Munsell hue prefix is between 0 and 10, which are the limits of the
 % Munsell system.
-if HueNumber < 0 | HueNumber > 10
-   Status.ind = 3;		% Set error and return
-   return
+if exist('HueNumber')
+    if HueNumber < 0 | HueNumber > 10
+       Status.ind = 3;		% Set error and return
+       return
+    end
 end
 
 % Bound Munsell value between two integer values, ValueMinus and ValuePlus, for which Munsell
