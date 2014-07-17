@@ -133,7 +133,7 @@ end
 % To be consistent with ColorLab format, change 0 to 10, and adjust the hue designator.
 if MunsellHueNumber == 0
    MunsellHueNumber           = 10										;
-   MunsellHueLetterDesignator = mod(MunsellHueLetterDesignator + 1, 10)	;
+   ColorLabHueLetterDesignator = mod(ColorLabHueLetterDesignator + 1, 10)	;
 end
 
 % Remainder of Munsell specification string is value and chroma
