@@ -128,7 +128,7 @@ for ctr = 1:length(IllumObs)
 end
 
 % Eliminate spaces and only use upper-case, to be consistent with OptProp requirements
-IllObsCaps = toupper(deblank(IllumObsWithSlash))	;
+IllObsCaps = upper(deblank(IllumObsWithSlash))	;
 
 % The reflectance function of a white surface is identically 1 (or 100 percent) across
 % all wavelengths in the visible spectrum, so construct this reflectance function
