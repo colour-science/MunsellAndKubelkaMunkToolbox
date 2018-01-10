@@ -67,6 +67,13 @@ function [x y Y Status] = MunsellToxyYfromExtrapolatedRenotation(ColorLabColour)
 %				format, consisting of the grey value.  For example, N4 is [4] in ColorLab
 %				format.
 %
+%				While the renotation uses hue numbers of 2.5, 5.0, 7.5, or 10.0, sometimes
+%				a hue number of 0 is used for hues with hue number 10.  For example,
+%				instead of writing 10Y, one might write 0GY; these two hues are the same.
+%				This routine has been revised to allow hue numbers to be input as 0.  Such
+%				inputs are changed to 10 (of an adjacent hue), so that they can be read
+%				from the renotation data.
+%
 %				This routine calculates HueIndex, ValueIndex, and ChromaIndex from the input
 %				colour vector, and then evaluates the three renotation matrices at those
 %				indices.
@@ -111,8 +118,11 @@ function [x y Y Status] = MunsellToxyYfromExtrapolatedRenotation(ColorLabColour)
 %				 ---Moved from MunsellConversions program to MunsellToolbox.
 % Revision		Paul Centore (August 31, 2013)  
 %				 ---Moved from MunsellToolbox program to MunsellAndKubelkaMunkToolbox.
+% Revision		Paul Centore (August 18, 2015)  
+%				 ---Allowed hue number to be 0, and converted to 10.  E.g. 0GY would be
+%				    converted to 10Y.
 %
-% Copyright 2010, 2012 Paul Centore
+% Copyright 2010-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -141,6 +151,11 @@ Status.Messages = {'Success',...
 x = -99	;
 y = -99	;
 Y = -99	;
+
+% To avoid numerical issues, the numerical hue prefix number is not required to be exactly
+% 0.0, 2.5, 5, 7.5, or 10, but only very close: it must be within NHPthreshold
+NHPthreshold = 0.001;	
+NHPthreshold = 0.001	;							
 	
 % Load renotation data as a MATLAB structure, if it is not already loaded
 persistent ExtrapolatedRenotationMatrices		% Load data only once, to save time
@@ -164,6 +179,17 @@ else	% ColorLab vector has four elements
    HueLetterDesignator = ColorLabColour(4)		;
    Value               = ColorLabColour(2)		;
    Chroma              = ColorLabColour(3)		;
+   
+	% If the numerical hue prefix is 0, it will be changed to 10, with an appropriate
+	% adjustment of the hue letter.
+	if abs(NumericalHuePrefix) < NHPthreshold
+		NumericalHuePrefix  = 10						;
+		HueLetterDesignator = HueLetterDesignator + 1	;
+		% The hue 0PB must be wrapped around to 10B
+		if HueLetterDesignator > 10
+			HueLetterDesignator = 1	;
+		end
+	end	
 end
 		   
 % Check that value is an integer between 1 and 9.  If not, return with an error message.
@@ -198,8 +224,6 @@ else		% Find HueIndex and ChromaIndex for chromatic colours.
    end
    
    % Use the numerical hue prefix to find where in the list of HueIndexes the input hue is
-   NHPthreshold = 0.001;	% To avoid numerical issues, the numerical hue number is not required
-							% to be exactly 2.5, 5, 7.5, or 10, but only very close
    if abs(NumericalHuePrefix-2.5) <= NHPthreshold
       NumberPosition = 1;
    elseif abs(NumericalHuePrefix-5) <= NHPthreshold

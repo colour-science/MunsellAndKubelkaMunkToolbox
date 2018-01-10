@@ -1,4 +1,7 @@
-function NumberOfPagesPrinted = PrintRGBs(RGB, InputFigname, inp_maxdown, inp_maxacross);
+function NumberOfPagesPrinted = PrintRGBs(RGB,...
+										  InputFigname,...
+										  inp_maxdown,...
+										  inp_maxacross);
 % Purpose		Print a set of RGB triples, to be measured. 
 %
 % Description	This routine is intended to be used when determining the RGBs needed to print
@@ -7,15 +10,14 @@ function NumberOfPagesPrinted = PrintRGBs(RGB, InputFigname, inp_maxdown, inp_ma
 %				that determines RGBs.  The printed RGBs might span several pages.  All
 %				pages will be saved automatically for further use.
 %
-% Syntax		PrintRGBs(RGB, InputFigname);
-%
 %				RGB				A three-column matrix of RGB triples to be printed 
 %
 %				InputFigname	A figure name to be used when saving the printed figure
 %
-%				inp_max_down, inp_maxacross	The maximum number of blocks to print, both
+%				inp_max_down, inp_maxacross		The maximum number of blocks to print, both
 %								down the page, and across the page.  The routine will
-%								print as many pages as needed, within those constraints.
+%								print as many pages as needed, within those constraints.  
+%								These inputs are optional
 %
 %				NumberOfPagesPrinted	A returned variable that says how many pages were
 %										printed
@@ -26,8 +28,12 @@ function NumberOfPagesPrinted = PrintRGBs(RGB, InputFigname, inp_maxdown, inp_ma
 %				   of rows and columns to be printed on each page
 % Revision		Paul Centore (January 20, 2014)
 %				---Returned the number of pages that were printed
+% Revision		Paul Centore (September 24, 2014)
+%				---Replace print option -deps with -depsc, so that colours are handled correctly
+% Revision		Paul Centore (June 27, 2015)
+%				---Added option to place white border around printed squares
 %
-% Copyright 2012-2014 Paul Centore
+% Copyright 2012-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -86,15 +92,26 @@ while ~isempty(UnprintedRGB)
 
     scalefactor = 1			;
 
+	% Changed by Paul Centore on June 27, 2015, to add optional blank border around patches
+	BorderFactor = 1.0	;	% Make BorderFactor 1 for no border; as BorderFactor goes towards 0,
+							% the blank border gets larger
     for index = 1:NumOfColours
 	    c = mod(index-1, maxacross)	;
 	    r = floor((index-1)/maxacross) + 1	;
-        patch(scalefactor*[c-1, c-1, c, c, c-1],...
-		      scalefactor*[1-r, -r, -r, 1-r, 1-r],...
+	    PatchCenter = [c-(1/2), (1/2)-r]	;
+	    CornerxCoordsWithoutBorder = [c-1, c-1, c, c, c-1]		;
+	    CorneryCoordsWithoutBorder = [1-r, -r, -r, 1-r, 1-r]	;
+	    CornerxCoordsWithBorder = BorderFactor * CornerxCoordsWithoutBorder + ...
+	                              (1-BorderFactor) * repmat(PatchCenter(1),1,5)	;
+	    CorneryCoordsWithBorder = BorderFactor * CorneryCoordsWithoutBorder + ...
+	                              (1-BorderFactor) * repmat(PatchCenter(2),1,5)	;
+        patch(scalefactor*CornerxCoordsWithBorder,...
+		      scalefactor*CorneryCoordsWithBorder,...
 			  RGBforPrinting(index,:),...
 			  'Edgecolor', 'none');
         hold on
     end
+    % End change
 
     set(gca, 'xlim', [-1 maxacross])		
     set(gca, 'ylim', [-r 0])		
@@ -105,7 +122,7 @@ while ~isempty(UnprintedRGB)
     drawnow()		;
 	fflush(stdout)	;
 	
-    print(gcf, [figname,'.eps'], '-deps');
+    print(gcf, [figname,'.eps'], '-depsc');
     print(gcf, [figname,'.png'], '-dpng');
     print(gcf, [figname,'.jpg'], '-djpg');
     print(gcf, [figname,'.pdf'], '-dpdf');

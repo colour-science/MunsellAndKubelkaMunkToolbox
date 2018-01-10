@@ -1,9 +1,17 @@
-function [ColoursPrinted, RGBDe] = PrintMunsellHueSheetFromMunsellRGBList(...
-                             HuePrefix, CLHueLetter, MunsellRGBList, DEthreshold, NonThresholdMunsellSpecs);
+function [ColoursPrinted, ...
+          RGBDe, ...
+          HueSheetFigure] = PrintMunsellHueSheetFromMunsellRGBList(...
+                             		HuePrefix, ...
+                             		CLHueLetter, ...
+                             		MunsellRGBList, ...
+                             		DEthreshold, ...
+                             		NonThresholdMunsellSpecs, ...
+                             		ExcludedMunsellSpecs);
 % Purpose		Print a Munsell sheet, over standard values and chromas, for an input
 %				Munsell hue.  Use data contained in an input file.  The file expresses
 %				the printed output of an RGB specification in Munsell coordinates, for a
-%				certain printer, settings, inkset, and paper.
+%				certain printer, settings, inkset, and paper.  The file also contains 
+%				colour differences (expressed in DE2000) from the targets.
 %
 % Description	The Munsell system specifies a local colour by giving its hue (H), value (V),
 %				and chroma (C) in the form H V/C.  The value is a number between 0 and 10.  
@@ -15,14 +23,14 @@ function [ColoursPrinted, RGBDe] = PrintMunsellHueSheetFromMunsellRGBList(...
 %				string "N," and V is the value.  For example, 5.0R 9.0/2.0 is a light pastel
 %				red, while N3 is a dark grey.
 %
-%				Routines in ColorLab use the Munsell specifications, but not necessarily the
+%				Some routines in ColorLab use the Munsell specifications, but not necessarily the
 %				Munsell notation H V/C.  A Munsell vector is given by [H1, V, C, H2], where 
 %				H1 is the number designator for hue, H2 is the position of the hue letter 
 %				designator in the list
 %				                  {B, BG, G, GY, Y, YR, R, RP, P, PB},
 %				V is the Munsell value, and C is the Munsell chroma. For example, 
-%				5.0R9.0/4.0 is [5 9 4 7] in ColorLab format.  The two inputs to this
-%				routine are H1 and H2, respectively.
+%				5.0R9.0/4.0 is [5 9 4 7] in ColorLab format.  H1 and H2 are two inputs to this
+%				routine.
 %
 %				The Munsell system is usually presented as a series of sheets, with each
 %				sheet displaying all the colours of a fixed hue.  The value increases in
@@ -57,15 +65,12 @@ function [ColoursPrinted, RGBDe] = PrintMunsellHueSheetFromMunsellRGBList(...
 %				conditions (same printer, settings, inkset, paper, CMS) match those under which the input
 %				matrix was generated, the output should be the desired Munsell colour.  A check is done
 %				to insure that the printed RGB matches the Munsell colour to within a desired threshold.
-%				The closeness of the match is measured with the CIEDE2000 difference formula.  
 %
 %				In addition, an optional input is a list of Munsell specifications for which no threshold is
 %				required.  Any RGB that is available for these specifications will be displayed,
 %				regardless of its DE.  A note will be printed to the console whenever this occurs,
 %				informing the user of the actual DE.  This option was added because gaps will usually appear
 %				in a Munsell page, when the same DE is used for the entire set of colours.
-%
-% Syntax		[ColoursPrinted, RGBDe] = PrintMunsellHueSheetFromMunsellRGBList(HuePrefix, CLHueLetter, MunsellRGBList);
 %
 %				HuePrefix		A value between 0 and 10 that prefixes a literal Munsell
 %								hue description, such as the 6.3 in 6.3RP.
@@ -84,22 +89,24 @@ function [ColoursPrinted, RGBDe] = PrintMunsellHueSheetFromMunsellRGBList(...
 %				DEthreshold		Only print RGBs that match an aimpoint to within a desired threshold.
 %
 %				NonThresholdMunsellSpecs	Print RGBs for these Munsell specifications, even if they do not
-%											meet the desired threshold.  This input is optional.
+%											meet the desired threshold.  
+%
+%				ExcludedMunsellSpecs	Do not print RGBs for these Munsell specifications, even if they 
+%										meet the desired threshold.  
 %
 %				ColoursPrinted	Return list of colours printed.
 %
 %				RGBDe			A 4-column output matrix.  Each row corresponds to an entry in
 %								ColoursPrinted, and gives the RGB for printing, and the DE
 %
-% Related		
-% Functions
-%
-% Required		MaxChromaForMunsellHueAndValue, MunsellToxyY, xyY2XYZ, XYZ2RGBapplergbD50
-% Functions		
+%				HueSheetFigure	The hue sheet in Octave/Matlab s figure format
 %
 % Author		Paul Centore (November 22, 2012)
+% Revised		Paul Centore (December 10, 2014)
+%				---Added check for greys in comparison, to avoid out-of-bounds error
+%				---Made figure an output to be returned, rather than printed out and saved here
 %
-% Copyright 2010-2012 Paul Centore
+% Copyright 2012, 2014 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -119,8 +126,7 @@ function [ColoursPrinted, RGBDe] = PrintMunsellHueSheetFromMunsellRGBList(...
 % ColorLab hue letters for Munsell specifications
 ColourLetters = {'B', 'BG', 'G', 'GY', 'Y', 'YR', 'R', 'RP', 'P', 'PB'}	;
 
-% Start list of colours that are actually printed on the output page, and list of
-% RGBs to be printed, and DEs
+% Start list of colours that are actually printed on the output page, and list of DEs
 ColoursPrinted = {}			;
 RGBDe          = []			;
 
@@ -149,10 +155,9 @@ fclose(fid)								;
 
 NumOfDataPoints = length(MunsellList)	;		
 
-figure
-figuretitle = ['MunsellSheetFor',num2str(round(10*HuePrefix)),ColourLetters{CLHueLetter},'ForPrinting'];
-%figuretitle = ['MunsellSheetFor',deblank(toupper([num2str(HuePrefix),ColourLetters{CLHueLetter}])),'ForPrinting'];
-set(gcf, 'Name', figuretitle, 'Color', [1 1 1]);
+% Create the figure for the hue sheet
+HueSheetFigure = figure	;
+set(gcf, 'Color', [1 1 1]);
 % Display the Munsell hue sheet so that one value step equals two chroma steps, as
 % is customary.
 CVratio = 2;
@@ -162,36 +167,56 @@ MaxChromaForDisplay = 20	;
 
 % Draw a row for each value
 for Value = 1:9
-%disp(['Value: ', num2str(Value)]);
    % The colours for each value extend out to a maximum chroma
    [MaxChroma Status] = MaxChromaForMunsellHueAndValue(HuePrefix, CLHueLetter, Value)	;
    % Only display chromas out to some MaxChromaForDisplay, even if the MacAdam limits exceed this
    MaxChroma = min(MaxChroma, MaxChromaForDisplay)										;
    
+   % Draw a colour square for each chroma for which RGBs are available
    for Chroma = 2:2:MaxChroma
       % Convert Munsell specification to RGB coordinates, by looking through input matrix
 	  ctr =	1						;
-	  MunsellStringFound  = false	;
+	  MunsellStringFound   = false	;
+	  
+	  % Check whether this Munsell specification is on the excluded list
+	  TempMunsellString = ColorLabFormatToMunsellSpec([HuePrefix,Value,Chroma,CLHueLetter],...
+                                                         2,0,0);
+	  TempMunsellString(TempMunsellString == ' ') = ''	; % Remove blanks from string
+	  if ismember(TempMunsellString, ExcludedMunsellSpecs)
+		  ExcludeMunsellString = true	
+	  else
+		  ExcludeMunsellString = false	;
+	  end
+	  
+	  % We are looking for an RGB that corresponds to a Munsell colour, along with a DE
+	  % giving its accuracy.  Initialize these value with -99.  The desired RGB might not
+	  % exist, so we must check for it
 	  R = -99						;
 	  G = -99						;
 	  B = -99						;
 	  DE2000 = -99					;
-	  while ctr <= NumOfDataPoints && MunsellStringFound == false 
-	      % MunsellDataPoint expresses a Munsell specification from the input file, in ColorLab format
-		  MunsellString = MunsellList{ctr}	;
-	      MunsellDataPoint = MunsellSpecToColorLabFormat(MunsellString);
-		  
-		  % Check element by element to see if this Munsell specification from the input matches
-		  % the Munsell colour we are trying to print
-	      if MunsellDataPoint(1) == HuePrefix && MunsellDataPoint(2) == Value && ...
-		      MunsellDataPoint(3) == Chroma && MunsellDataPoint(4) == CLHueLetter 
-			  R = RGBdata(ctr, 1)		;
-			  G = RGBdata(ctr, 2)		;
-			  B = RGBdata(ctr, 3)		;
-	          DE2000 = RGBdata(ctr, 4)	;
-			  MunsellStringFound = true	;
+	  if ExcludeMunsellString == false 		% Only investigate colours that will be printed
+	  	  % Check through all data points, looking for a match
+		  while ctr <= NumOfDataPoints && MunsellStringFound == false 
+			  % MunsellDataPoint expresses a Munsell specification from the input file, in ColorLab format
+			  MunsellString    = MunsellList{ctr}							;
+			  MunsellDataPoint = MunsellSpecToColorLabFormat(MunsellString)	;
+
+			  % Check element by element to see if this Munsell specification from the input matches
+			  % the Munsell colour we are trying to print.  If the MunsellDataPoint vector only has
+			  % one entry, then it is a grey, and will be ignored since this routine is for hue sheets
+			  if length(MunsellDataPoint) > 1 	% Ignore greys
+				  if MunsellDataPoint(1) == HuePrefix && MunsellDataPoint(2) == Value && ...
+					  MunsellDataPoint(3) == Chroma && MunsellDataPoint(4) == CLHueLetter 
+					  R = RGBdata(ctr, 1)		;
+					  G = RGBdata(ctr, 2)		;
+					  B = RGBdata(ctr, 3)		;
+					  DE2000 = RGBdata(ctr, 4)	;
+					  MunsellStringFound = true	;
+				  end
+			  end
+			  ctr = ctr + 1	;
 		  end
-		  ctr = ctr + 1	;
 	  end
 	  
 	  % Draw Munsell sample, centered on the Cartesian point (Chroma, Value)
@@ -207,8 +232,10 @@ for Value = 1:9
 	  % DE threshold, then the sample can be printed.  If the DE is not within the threshold,
 	  % but the colour is on the list of colours where a threshold is not required, it can
 	  % still be printed.  Otherwise, an empty box will be drawn where the colour would have been.
-
-	  if MunsellStringFound == true 
+	  % This Munsell specification might also have been marked for non-printing, in which case an
+	  % exclusion flag will have been set
+	  
+	  if MunsellStringFound == true && ExcludeMunsellString == false
 	     if DE2000 <= DEthreshold
 	        patch(cornerX, cornerY, [R, G, B], 'EdgeColor', [1 1 1]);
 		    ColoursPrinted{end+1} = MunsellString	;	% Add to list of colours printed out
@@ -219,10 +246,10 @@ for Value = 1:9
 			RGBDe = [RGBDe; R, G, B, DE2000]		;
 			disp(['Munsell colour out of threshold: ',MunsellString,', DE is ', num2str(DE2000)]);
 	     else
-	        patch(cornerX, cornerY, [1 1 1], 'EdgeColor', [0 0 0]);
+	        patch(cornerX, cornerY, [1 1 1], 'EdgeColor', [0 0 0]); 	% Print empty block
 		 end
 	  else
-	     patch(cornerX, cornerY, [1 1 1], 'EdgeColor', [0 0 0]);
+	     patch(cornerX, cornerY, [1 1 1], 'EdgeColor', [0 0 0]);	% Print empty block
 	  end
 	  hold on
    end
@@ -230,7 +257,7 @@ end
 
 % Add text annotations on printed hue sheet
 for ind = 1:9
-	text(0.5,ind,num2str(ind))		;		% Value label
+	text(0.5,ind,num2str(ind))					;		% Value label
 	hold on
 end
 for ind = 2:2:20
@@ -244,19 +271,29 @@ for ind = 2:2:20
 end
 
 % Print label for hue sheet
-PrefixString = sprintf('%3.1f', HuePrefix)		;
+PrefixString = sprintf('%3.1f', HuePrefix)		;	% '%3.1f' for 1 decimal place, '%4.2f' for 2 decimal places
 HueString    = ColourLetters{CLHueLetter}		;
 HueLabel     = [PrefixString, HueString]		;
-text(-2,5,HueLabel,'Fontsize', 16)				;
+% Print the label in the upper right corner, unless that would interfere with printing the
+% colours, in which case the label should be placed in the bottom right corner.  This is
+% necessary on the pages in the conditional statement
+if strcmp(HueLabel,'5.0Y') || ...
+   strcmp(HueLabel, '7.5Y') || ...
+   strcmp(HueLabel, '10.0Y') || ...
+   strcmp(HueLabel, '2.5GY') || ...
+   strcmp(HueLabel, '5.0GY') || ...
+   strcmp(HueLabel, '7.5GY') || ...
+   strcmp(HueLabel, '10.0GY') || ...
+   strcmp(HueLabel, '1.75GY')
+	text(20+CVratio*SizePar/2,1,HueLabel,'Fontname', 'Times','Fontsize', 35, 'horizontalalignment', 'right')				;
+else
+	text(20+CVratio*SizePar/2,9,HueLabel,'Fontname', 'Times','Fontsize', 35, 'horizontalalignment', 'right')				;
+end
 
+% Format the hue sheet figure
 set(gca, 'xlim', [-3 22], 'ylim', [0 10]);
 set(gca, 'xcolor', [1 1 1], 'ycolor', [1 1 1])	;
 set(gca, 'box', 'off')
 set(gca, 'xtick', [], 'ytick', [])
-
-print(gcf, [figuretitle,'.eps'], '-deps');
-print(gcf, [figuretitle,'.png'], '-dpng');
-print(gcf, [figuretitle,'.jpg'], '-djpg');
-print(gcf, [figuretitle,'.pdf'], '-dpdf');
 
 return; 

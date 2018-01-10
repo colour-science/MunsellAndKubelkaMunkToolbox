@@ -1,0 +1,380 @@
+Description:  
+In 1955, the Inter-Society Color Council (ISCC) and the US National Bureau of Standards 
+(NBS) (now called NIST) produced the ISCC-NBS colour naming system [Kelly1976].  This
+system expresses common verbal colour descriptions, such as "light purplish pink," in 
+terms of the Munsell system [Newhall1943].  Terms such as "light purplish pink" encompass
+a multitude of distinguishable colours.  In fact, any Munsell colour whose hue is between
+9P and 9RP, whose value is greater than 7.5, and whose chroma is between 5 and 9, would
+be considered a light purplish pink.  
+
+The ISCC-NBS system formalizes such relationships.  It gives colour names at three
+increasing levels of precision.  In Level 1, a colour is designated very broadly, using
+one of 13 common names (pink, red, orange, brown, yellow, olive, yellow green, green,
+blue, purple, white, gray, or black).  This description is commonly understood, but only
+approximate: there are many colours, for example, that would be called "red."  In Level 2,
+16 intermediate colour names are added (yellowish pink, reddish orange, reddish brown,
+orange yellow, yellowish brown, olive brown, greenish yellow, yellow green, olive green,
+yellowish green, bluish green, greenish blue, purplish blue, reddish purple, purplish
+pink, and purplish red).  Combining the 16 intermediate terms with the 13 original terms
+from Level 1 gives a total of 29 Level 2 colour names.  Level 3 extends Level 2 by adding 
+modifiers such as light, deep, grayish, vivid, etc.  In all, Level 3 contains 267 colour
+names, and is the most detailed level of the ISCC-NBS system.  Each of the 267 colour
+names has been given a standard index number; Table 10.1 of [Agoston1987] lists all 267 names,
+along with their indices.
+
+In theory, each category in Level 2 is a subset of some category in Level 1, and each
+category in Level 3 is a subset of some category in Level 2.  Thus a Level 3 term such as
+light purplish pink automatically indicates a Level 2 term (purplish pink) and a Level 1
+term (pink); these three terms could describe the same colour, with finer or grosser
+accuracy.  In practice, the relationships between levels are not so clear.  Table 10.1
+of [Agoston1987] categorizes the 267 Level 3 terms into the 29 Level 2 terms, but the
+names (especially for whites, grays, and blacks) do not always support the categorization.
+For example, the term reddish black (#24 of 267) is placed in the Level 2 category of
+red, when arguably it should be placed in the Level 2 category of black.  The same confusion
+occurs when one tries to assign reddish black to a Level 1 category.  Another example is
+the Level 2 category olive green: should that category be a subset of the Level 1
+category of olive, or of green?  Since [Kelly1976] seems unclear on such questions,
+judgement calls were made when needed (for example, olive green was classified as Level 1
+olive rather than Level 1 green), but other researchers could justifiably make different
+decisions.
+
+This file lists the ISCC-NBS Level 1, 2, and 3 colour names, or designators, along with
+their indices.  The Level 3 indices were taken from Table 10.1 of [Agoston1987], and come
+originally from [Kelly1976].  The indices for Level 1 and 2 do not seem to have been
+standardized, so they were assigned in an order in which the Level 1 and 2 names are
+commonly given.  In addition, [Kelly1976] specifies a method of assigning abbreviations to
+each designator, so this files lists those abbreviations, too.  Code can easily be written,
+in any preferred programming language, to read the data from this file, for use in   
+computer applications.
+
+[Kelly1976] Kenneth L. Kelly & Deane B. Judd, "Color: Universal Language and Dictionary 
+		of Names," NBS Special Publication 440, 1976. Available online at
+		http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication440.pdf or
+		https://ia801701.us.archive.org/9/items/coloruniversalla00kell/coloruniversalla00kell.pdf
+[Newhall1943] S. M. Newhall, D. Nickerson, & D. B. Judd, "Final
+        Report of the O.S.A. Subcommittee on the Spacing of the Munsell
+        Colors," Journal of the Optical Society of America, Vol. 33,
+        Issue 7, pp. 385-418, 1943.
+[Agoston1987] George A. Agoston, Color Theory and Its Application in Art and Design,
+		Springer, 1987.        
+		
+Author:	Paul Centore (March 15, 2016)
+Copyright 2016 Paul Centore
+This file is released under the GNU General Public License (see http://www.gnu.org/licenses/ )
+
+DESCRIPTION ENDS HERE
+Level1	Designator	Abbreviation
+1	Pink	Pk
+2	Red	R
+3	Orange	O
+4	Brown	Br
+5	Yellow	Y
+6	Olive	Ol
+7	Yellow green	YG
+8	Green	G
+9	Blue	B
+10	Purple	P
+11	White	Wh
+12	Gray	Gy
+13	Black	Bk
+LEVEL 1 DESCRIPTION ENDS HERE
+Level2	Level1	Designator	Abbreviation
+1	1	Pink	Pk
+2	2	Red	R
+3	1	Yellowish pink	yPk
+4	3	Reddish orange	rO
+5	4	Reddish brown	rBr
+6	3	Orange	O
+7	4	Brown	Br
+8	5	Orange yellow	OY
+9	4	Yellowish brown	yBr
+10	5	Yellow	Y
+11	6	Olive brown	OlBr
+12	5	Greenish yellow	gY
+13	6	Olive	Ol
+14	7	Yellow green	YG
+15	6	Olive green	OlG
+16	8	Yellowish green	yG
+17	8	Green	G
+18	8	Bluish green	bG
+19	9	Greenish blue	gB
+20	9	Blue	B
+21	9	Purplish blue	pB
+22	10	Violet	V
+23	10	Purple	P
+24	10	Reddish purple	rP
+25	1	Purplish pink	pPk
+26	2	Purplish red	pR
+27	11	White	Wh
+28	12	Gray	Gy
+29	13	Black	Bk
+LEVEL 2 DESCRIPTION ENDS HERE
+Level3	Level2	Level1	Designator	Abbreviation
+1	1	1	Vivid pink	viv.Pk
+2	1	1	Strong pink	s.Pk
+3	1	1	Deep pink	dp.Pk
+4	1	1	Light pink	l.Pk
+5	1	1	Moderate pink	m.Pk
+6	1	1	Dark pink	d.Pk
+7	1	1	Pale pink	p.Pk
+8	1	1	Grayish pink	gy.Pk
+9	1	1	Pinkish white	pkWh
+10	1	1	Pinkish gray	pkGy
+11	2	2	Vivid red	viv.R
+12	2	2	Strong red	s.R
+13	2	2	Deep red	dp.R
+14	2	2	Very deep red	v.dp.R
+15	2	2	Moderate red	m.R
+16	2	2	Dark red	d.R
+17	2	2	Very dark red	v.d.R
+18	2	2	Light grayish red	l.gy.R
+19	2	2	Grayish red	gy.R
+20	2	2	Dark grayish red	d.gy.R
+21	2	2	Blackish red	bkR
+22	2	2	Reddish gray	rGy
+23	2	2	Dark reddish gray	d.rGy
+24	2	2	Reddish black	rBk
+25	3	1	Vivid yellowish pink	viv.yPk
+26	3	1	Strong yellowish pink	s.yPk
+27	3	1	Deep yellowish pink	dp.yPk
+28	3	1	Light yellowish pink	l.yPk
+29	3	1	Moderate yellowish pink	m.yPk
+30	3	1	Dark yellowish pink	d.yPk
+31	3	1	Pale yellowish pink	p.yPk
+32	3	1	Grayish yellowish pink	gy.yPk
+33	3	1	Brownish pink	brPk
+34	4	3	Vivid reddish orange	viv.rO
+35	4	3	Strong reddish orange	s.rO
+36	4	3	Deep reddish orange	dp.rO
+37	4	3	Moderate reddish orange	m.rO
+38	4	3	Dark reddish orange	d.rO
+39	4	3	Grayish reddish orange	gy.rO
+40	5	4	Strong reddish brown	s.rBr
+41	5	4	Deep reddish brown	dp.rBr
+42	5	4	Light reddish brown	l.rBr
+43	5	4	Moderate reddish brown	m.rBr
+44	5	4	Dark reddish brown	d.rBr
+45	5	4	Light grayish reddish brown	l.gy.rBr
+46	5	4	Grayish reddish brown	gy.rBr
+47	5	4	Dark grayish reddish brown	d.gy.rBr
+48	6	3	Vivid orange	viv.O
+49	6	3	Brilliant orange	brill.O
+50	6	3	Strong orange	s.O
+51	6	3	Deep orange	dp.O
+52	6	3	Light orange	l.O
+53	6	3	Moderate orange	m.O
+54	6	3	Brownish orange	brO
+55	7	4	Strong brown	s.Br
+56	7	4	Deep brown	dp.Br
+57	7	4	Light brown	l.Br
+58	7	4	Moderate brown	m.Br
+59	7	4	Dark brown	d.Br
+60	7	4	Light grayish brown	l.gy.Br
+61	7	4	Grayish brown	gy.Br
+62	7	4	Dark grayish brown	d.gy.Br
+63	7	4	Light brownish gray	l.brGy
+64	7	4	Brownish gray	brGy
+65	7	4	Brownish black	brBk
+66	8	5	Vivid orange yellow	viv.OY
+67	8	5	Brilliant orange yellow	brill.OY
+68	8	5	Strong orange yellow	s.OY
+69	8	5	Deep orange yellow	dp.OY
+70	8	5	Light orange yellow	l.OY
+71	8	5	Moderate orange yellow	m.OY
+72	8	5	Dark orange yellow	d.OY
+73	8	5	Pale orange yellow	p.OY
+74	9	4	Strong yellowish brown	s.yBr
+75	9	4	Deep yellowish brown	dp.yBr
+76	9	4	Light yellowish brown	l.yBr
+77	9	4	Moderate yellowish brown	m.yBr
+78	9	4	Dark yellowish brown	d.yBr
+79	9	4	Light grayish yellowish brown	l.gy.yBr
+80	9	4	Grayish yellowish brown	gy.yBr
+81	9	4	Dark grayish yellowish brown	d.gy.yBr
+82	10	5	Vivid yellow	viv.Y
+83	10	5	Brilliant yellow	brill.Y
+84	10	5	Strong yellow	s.Y
+85	10	5	Deep yellow	dp.Y
+86	10	5	Light yellow	l.Y
+87	10	5	Moderate yellow	m.Y
+88	10	5	Dark yellow	d.Y
+89	10	5	Pale yellow	p.Y
+90	10	5	Grayish yellow	gy.Y
+91	10	5	Dark grayish yellow	d.gy.Y
+92	10	5	Yellowish white	yWh
+93	10	5	Yellowish gray	yGy
+94	11	6	Light olive brown	l.OlBr
+95	11	6	Moderate olive brown	m.OlBr
+96	11	6	Dark olive brown	d.OlBr
+97	12	5	Vivid greenish yellow	viv.gY
+98	12	5	Brilliant greenish yellow	brill.gY
+99	12	5	Strong greenish yellow	s.gY
+100	12	5	Deep greenish yellow	dp.gY
+101	12	5	Light greenish yellow	l.gY
+102	12	5	Moderate greenish yellow	m.gY
+103	12	5	Dark greenish yellow	d.gY
+104	12	5	Pale greenish yellow	p.gY
+105	12	5	Grayish greenish yellow	gy.gY
+106	13	6	Light olive	l.Ol
+107	13	6	Moderate olive	m.Ol
+108	13	6	Dark olive	d.Ol
+109	13	6	Light grayish olive	l.gy.Ol
+110	13	6	Grayish olive	gy.Ol
+111	13	6	Dark grayish olive	d.gy.Ol
+112	13	6	Light olive gray	l.OlGy
+113	13	6	Olive gray	OlGy
+114	13	6	Olive black	OlBk
+115	14	7	Vivid yellow green	viv.YG
+116	14	7	Brilliant yellow green	brill.YG
+117	14	7	Strong yellow green	s.YG
+118	14	7	Deep yellow green	d.YG
+119	14	7	Light yellow green	l.YG
+120	14	7	Moderate yellow green	m.YG
+121	14	7	Pale yellow green	p.YG
+122	14	7	Grayish yellow green	gy.YG
+123	15	6	Strong olive green	s.OlG
+124	15	6	Deep olive green	dp.OlG
+125	15	6	Moderate olive green	m.OlG
+126	15	6	Dark olive green	d.OlG
+127	15	6	Grayish olive green	gy.OlG
+128	15	6	Dark grayish olive green	d.gy.OlG
+129	16	8	Vivid yellowish green	viv.yG
+130	16	8	Brilliant yellowish green	brill.yG
+131	16	8	Strong yellowish green	s.yG
+132	16	8	Deep yellowish green	dp.yG
+133	16	8	Very deep yellowish green	v.dp.yG
+134	16	8	Very light yellowish green	v.l.yG
+135	16	8	Light yellowish green	l.yG
+136	16	8	Moderate yellowish green	m.yG
+137	16	8	Dark yellowish green	d.yG
+138	16	8	Very dark yellowish green	v.d.yG
+139	17	8	Vivid green	viv.G
+140	17	8	Brilliant green	brill.G
+141	17	8	Strong green	s.G
+142	17	8	Deep green	dp.G
+143	17	8	Very light green	v.l.G
+144	17	8	Light green	l.G
+145	17	8	Moderate green	m.G
+146	17	8	Dark green	d.G
+147	17	8	Very dark green	v.d.G
+148	17	8	Very pale green	v.p.G
+149	17	8	Pale green	p.G
+150	17	8	Grayish green	gy.G
+151	17	8	Dark grayish green	d.gy.G
+152	17	8	Blackish green	bk.G
+153	17	8	Greenish white	gWh
+154	17	8	Light greenish gray	l.gGy
+155	17	8	Greenish gray	gGy
+156	17	8	Dark greenish gray	d.gGy
+157	17	8	Greenish black	gBk
+158	18	8	Vivid bluish green	viv.bG
+159	18	8	Brilliant bluish green	brill.bG
+160	18	8	Strong bluish green	s.bG
+161	18	8	Deep bluish green	dp.bG
+162	18	8	Very light bluish green	v.l.bG
+163	18	8	Light bluish green	l.bG
+164	18	8	Moderate bluish green	m.bG
+165	18	8	Dark bluish green	d.bG
+166	18	8	Very dark bluish green	v.d.bG
+167	19	9	Vivid greenish blue	viv.gB
+168	19	9	Brilliant greenish blue	brill.gB
+169	19	9	Strong greenish blue	s.gB
+170	19	9	Deep greenish blue	dp.gB
+171	19	9	Very light greenish blue	v.l.gB
+172	19	9	Light greenish blue	l.gB
+173	19	9	Moderate greenish blue	m.gB
+174	19	9	Dark greenish blue	d.gB
+175	19	9	Very dark greenish blue	v.d.gB
+176	20	9	Vivid blue	viv.B
+177	20	9	Brilliant blue	brill.B
+178	20	9	Strong blue	s.B
+179	20	9	Deep blue	dp.B
+180	20	9	Very light blue	v.l.B
+181	20	9	Light blue	l.B
+182	20	9	Moderate blue	m.B
+183	20	9	Dark blue	d.B
+184	20	9	Very pale blue	v.p.B
+185	20	9	Pale blue	p.B
+186	20	9	Grayish blue	gy.B
+187	20	9	Dark grayish blue	d.gy.B
+188	20	9	Blackish blue	bkB
+189	20	9	Bluish white	bWh
+190	20	9	Light bluish gray	l.bGy
+191	20	9	Bluish gray	bGy
+192	20	9	Dark bluish gray	d.bGy
+193	20	9	Bluish black	bBk
+194	21	9	Vivid purplish blue	viv.pB
+195	21	9	Brilliant purplish blue	brill.pB
+196	21	9	Strong purplish blue	s.pB
+197	21	9	Deep purplish blue	dp.pB
+198	21	9	Very light purplish blue	v.l.pB
+199	21	9	Light purplish blue	l.pB
+200	21	9	Moderate purplish blue	m.pB
+201	21	9	Dark purplish blue	d.pB
+202	21	9	Very pale purplish blue	v.p.pB
+203	21	9	Pale purplish blue	p.pB
+204	21	9	Grayish purplish blue	gy.pB
+205	22	10	Vivid violet	viv.V
+206	22	10	Brilliant violet	brill.V
+207	22	10	Strong violet	s.V
+208	22	10	Deep violet	dp.V
+209	22	10	Very light violet	v.l.V
+210	22	10	Light violet	l.V
+211	22	10	Moderate violet	m.V
+212	22	10	Dark violet	d.V
+213	22	10	Very pale violet	v.p.V
+214	22	10	Pale violet	p.V
+215	22	10	Grayish violet	gy.V
+216	23	10	Vivid purple	viv.P
+217	23	10	Brilliant purple	brill.P
+218	23	10	Strong purple	s.P
+219	23	10	Deep purple	dp.P
+220	23	10	Very deep purple	v.dp.P
+221	23	10	Very light purple	v.l.P
+222	23	10	Light purple	l.P
+223	23	10	Moderate purple	m.P
+224	23	10	Dark purple	d.P
+225	23	10	Very dark purple	v.d.P
+226	23	10	Very pale purple	v.p.P
+227	23	10	Pale purple	p.P
+228	23	10	Grayish purple	gy.P
+229	23	10	Dark grayish purple	d.gy.P
+230	23	10	Blackish purple	bk.P
+231	23	10	Purplish white	pWh
+232	23	10	Light purplish gray	l.pGy
+233	23	10	Purplish gray	pGy
+234	23	10	Dark purplish gray	d.pGy
+235	23	10	Purplish black	pBk
+236	24	10	Vivid reddish purple	viv.rP
+237	24	10	Strong reddish purple	s.rP
+238	24	10	Deep reddish purple	dp.rP
+239	24	10	Very deep reddish purple	v.d.rP
+240	24	10	Light reddish purple	l.rP
+241	24	10	Moderate reddish purple	m.rP
+242	24	10	Dark reddish purple	d.rP
+243	24	10	Very dark reddish purple	v.d.rP
+244	24	10	Pale reddish purple	p.rP
+245	24	10	Grayish reddish purple	gy.rP
+246	25	1	Brilliant purplish pink	brill.pPk
+247	25	1	Strong purplish pink	s.pPk
+248	25	1	Deep purplish pink	dp.pPk
+249	25	1	Light purplish pink	l.pPk
+250	25	1	Moderate purplish pink	m.pPk
+251	25	1	Dark purplish pink	d.pPk
+252	25	1	Pale purplish pink	p.pPk
+253	25	1	Grayish purplish pink	gy.pPk
+254	26	2	Vivid purplish red	viv.pR
+255	26	2	Strong purplish red	s.pR
+256	26	2	Deep purplish red	dp.pR
+257	26	2	Very deep purplish red	v.dp.pR
+258	26	2	Moderate purplish red	m.pR
+259	26	2	Dark purplish red	d.pR
+260	26	2	Very dark purplish red	v.d.pR
+261	26	2	Light grayish purplish red	l.gy.pR
+262	26	2	Grayish purplish red	gy.pR
+263	27	11	White	Wh
+264	28	12	Light gray	l.Gy
+265	28	12	Medium gray	m.Gy
+266	28	12	Dark gray	d.Gy
+267	29	13	Black	Bk
+LEVEL 3 DESCRIPTION ENDS HERE

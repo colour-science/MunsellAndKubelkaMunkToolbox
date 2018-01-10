@@ -1,4 +1,4 @@
-function [MunsellSpecs, MunsellSpecsColorlab CIEcoords] = ReflectanceSpectrumToMunsellAndCIE(Wavelengths, ReflectanceSpectra);
+function [MunsellSpecs, MunsellSpecsColorlab, CIEcoords] = ReflectanceSpectrumToMunsellAndCIE(Wavelengths, ReflectanceSpectra);
 % Purpose		Given the reflectance spectrum of an object colour, calculate the 
 %				CIE and Munsell coordinates of the visual stimulus produced when that colour is
 %				illuminated by Illuminant C.
@@ -96,7 +96,7 @@ persistent IlluminantC				% Matrix of the form [wavelength (nm)|power at that wa
 
 % Check to make sure all reflectances are between 0 and 1
 if max(max(ReflectanceSpectra)) > 1.0 || min(min(ReflectanceSpectra)) < 0.0
-    disp(['Error: Reflectances must be between 0 and 1.'])
+    disp(['Error (in ReflectanceSpectrumToMunsellAndCIE): Reflectances must be between 0 and 1.'])
 	return
 end
 
@@ -180,10 +180,13 @@ CIEcoords = []												;
 % is a row in the ReflectanceSpectra matrix
 [NumOfSamples,~] = size(ReflectanceSpectra)					;
 for ind = 1:NumOfSamples
-if mod(ind,50) == 0
-    disp(['Munsell conversions: ', num2str(ind), ' of ', num2str(NumOfSamples)]);
-	fflush(stdout);
-end
+
+	% This routine can be slow, so print out regular progress updates
+	if mod(ind,200) == 0
+		disp(['Munsell conversions: ', num2str(ind), ' of ', num2str(NumOfSamples)]);
+		fflush(stdout);
+	end
+	
 	% The reflectance spectrum for a particular spectrum is one row in the Reflectances matrix
 	SampleReflectances = ReflectanceSpectra(ind,:)			;
 	% Suppose the sample is illuminated by a source that is distributed like Illuminant C.  At

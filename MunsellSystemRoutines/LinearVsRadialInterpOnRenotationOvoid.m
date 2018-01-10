@@ -110,8 +110,10 @@ function [InterpStyle, Status] = LinearVsRadialInterpOnRenotationOvoid(MunsellSp
 %				 ---Moved from MunsellConversions program to MunsellToolbox.
 % Revision		Paul Centore (August 31, 2013)  
 %				 ---Moved from MunsellToolbox program to MunsellAndKubelkaMunkToolbox.
+% Revision		Paul Centore (February 12, 2017)  
+%				 ---Replaced & with && to avoid short-circuit warnings
 %
-% Copyright 2010, 2012 Paul Centore
+% Copyright 2010-2017 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -227,25 +229,25 @@ if Value == 1
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 4 	  
-      if (ASTMHue > 12.5 & ASTMHue < 27.5) || (ASTMHue > 57.5 & ASTMHue < 80) 
+      if (ASTMHue > 12.5 && ASTMHue < 27.5) || (ASTMHue > 57.5 && ASTMHue < 80) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 6 
-      if (ASTMHue > 55 & ASTMHue < 80) 
+      if (ASTMHue > 55 && ASTMHue < 80) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 8 
-      if (ASTMHue > 67.5 & ASTMHue < 77.5) 
+      if (ASTMHue > 67.5 && ASTMHue < 77.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 10 
-      if (ASTMHue > 72.5 & ASTMHue < 77.5) 
+      if (ASTMHue > 72.5 && ASTMHue < 77.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
@@ -262,25 +264,25 @@ elseif Value == 2
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 4 	  
-      if (ASTMHue > 12.5 & ASTMHue < 30) || (ASTMHue > 62.5 & ASTMHue < 80) 
+      if (ASTMHue > 12.5 && ASTMHue < 30) || (ASTMHue > 62.5 && ASTMHue < 80) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 6 
-      if (ASTMHue > 7.5 & ASTMHue < 22.5) || (ASTMHue > 62.5 & ASTMHue < 80)
+      if (ASTMHue > 7.5 && ASTMHue < 22.5) || (ASTMHue > 62.5 && ASTMHue < 80)
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 8 
-      if (ASTMHue > 7.5 & ASTMHue < 15)  || (ASTMHue > 60 & ASTMHue < 80) 
+      if (ASTMHue > 7.5 && ASTMHue < 15)  || (ASTMHue > 60 && ASTMHue < 80) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 10 
-      if (ASTMHue > 65 & ASTMHue < 77.5) 
+      if (ASTMHue > 65 && ASTMHue < 77.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
@@ -297,19 +299,19 @@ elseif Value == 3
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 4 	  
-      if (ASTMHue > 5 & ASTMHue < 37.5) || (ASTMHue > 55 & ASTMHue < 72.5) 
+      if (ASTMHue > 5 && ASTMHue < 37.5) || (ASTMHue > 55 && ASTMHue < 72.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 6 || Chroma == 8 || Chroma == 10
-      if (ASTMHue > 7.5 & ASTMHue < 37.5) || (ASTMHue > 57.5 & ASTMHue < 82.5)
+      if (ASTMHue > 7.5 && ASTMHue < 37.5) || (ASTMHue > 57.5 && ASTMHue < 82.5)
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 12 
-      if (ASTMHue > 7.5 & ASTMHue < 42.5) || (ASTMHue > 57.5 & ASTMHue < 80) 
+      if (ASTMHue > 7.5 && ASTMHue < 42.5) || (ASTMHue > 57.5 && ASTMHue < 80) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
@@ -326,13 +328,13 @@ elseif Value == 4
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 6 || Chroma == 8 	  
-      if (ASTMHue > 7.5 & ASTMHue < 40) || (ASTMHue > 57.5 & ASTMHue < 82.5) 
+      if (ASTMHue > 7.5 && ASTMHue < 40) || (ASTMHue > 57.5 && ASTMHue < 82.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 10 
-      if (ASTMHue > 7.5 & ASTMHue < 40) || (ASTMHue > 57.5 & ASTMHue < 80) 
+      if (ASTMHue > 7.5 && ASTMHue < 40) || (ASTMHue > 57.5 && ASTMHue < 80) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
@@ -349,13 +351,13 @@ elseif Value == 5
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 4 || Chroma == 6 || Chroma == 8 	  
-      if (ASTMHue > 2.5 & ASTMHue < 42.5) || (ASTMHue > 55 & ASTMHue < 85) 
+      if (ASTMHue > 2.5 && ASTMHue < 42.5) || (ASTMHue > 55 && ASTMHue < 85) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 10 
-      if (ASTMHue > 2.5 & ASTMHue < 42.5) || (ASTMHue > 55 & ASTMHue < 82.5) 
+      if (ASTMHue > 2.5 && ASTMHue < 42.5) || (ASTMHue > 55 && ASTMHue < 82.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
@@ -372,25 +374,25 @@ elseif Value == 6
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 6 	  
-      if (ASTMHue > 5 & ASTMHue < 42.5) || (ASTMHue > 57.5 & ASTMHue < 87.5) 
+      if (ASTMHue > 5 && ASTMHue < 42.5) || (ASTMHue > 57.5 && ASTMHue < 87.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 8 || Chroma == 10 	  
-      if (ASTMHue > 5 & ASTMHue < 42.5) || (ASTMHue > 60 & ASTMHue < 85) 
+      if (ASTMHue > 5 && ASTMHue < 42.5) || (ASTMHue > 60 && ASTMHue < 85) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 12 || Chroma == 14 	  
-      if (ASTMHue > 5 & ASTMHue < 42.5) || (ASTMHue > 60 & ASTMHue < 82.5) 
+      if (ASTMHue > 5 && ASTMHue < 42.5) || (ASTMHue > 60 && ASTMHue < 82.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 16 
-      if (ASTMHue > 5 & ASTMHue < 42.5) || (ASTMHue > 60 & ASTMHue < 80) 
+      if (ASTMHue > 5 && ASTMHue < 42.5) || (ASTMHue > 60 && ASTMHue < 80) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
@@ -407,25 +409,25 @@ elseif Value == 7
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 8 	  
-      if (ASTMHue > 5 & ASTMHue < 42.5) || (ASTMHue > 60 & ASTMHue < 82.5) 
+      if (ASTMHue > 5 && ASTMHue < 42.5) || (ASTMHue > 60 && ASTMHue < 82.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 10 	  
-      if (ASTMHue > 30 & ASTMHue < 42.5) || (ASTMHue > 5 & ASTMHue < 25) || (ASTMHue > 60 & ASTMHue < 82.5) 
+      if (ASTMHue > 30 && ASTMHue < 42.5) || (ASTMHue > 5 && ASTMHue < 25) || (ASTMHue > 60 && ASTMHue < 82.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma == 12  	  
-      if (ASTMHue > 30 & ASTMHue < 42.5) || (ASTMHue > 7.5 & ASTMHue < 27.5) || (ASTMHue > 80 & ASTMHue < 82.5) 
+      if (ASTMHue > 30 && ASTMHue < 42.5) || (ASTMHue > 7.5 && ASTMHue < 27.5) || (ASTMHue > 80 && ASTMHue < 82.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 14 
-      if (ASTMHue > 32.5 & ASTMHue < 40) || (ASTMHue > 7.5 & ASTMHue < 15) || (ASTMHue > 80 & ASTMHue < 82.5) 
+      if (ASTMHue > 32.5 && ASTMHue < 40) || (ASTMHue > 7.5 && ASTMHue < 15) || (ASTMHue > 80 && ASTMHue < 82.5) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
@@ -442,7 +444,7 @@ elseif Value == 8
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 14 
-      if (ASTMHue > 32.5 & ASTMHue < 40) || (ASTMHue > 5 & ASTMHue < 15) || (ASTMHue > 60 & ASTMHue < 85) 
+      if (ASTMHue > 32.5 && ASTMHue < 40) || (ASTMHue > 5 && ASTMHue < 15) || (ASTMHue > 60 && ASTMHue < 85) 
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;
@@ -465,7 +467,7 @@ elseif Value == 9
 		 InterpStyle.Linear = true	;
 	  end
    elseif Chroma >= 16 
-      if (ASTMHue > 35 & ASTMHue < 42.5)  
+      if (ASTMHue > 35 && ASTMHue < 42.5)  
 	     InterpStyle.Radial = true	;
 	  else
 		 InterpStyle.Linear = true	;

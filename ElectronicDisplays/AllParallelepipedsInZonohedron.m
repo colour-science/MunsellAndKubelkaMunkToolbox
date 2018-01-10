@@ -4,45 +4,56 @@ function [AllParallelepipeds] = AllParallelepipedsInZonohedron(NumberOfGeneratin
 %				generating vectors must be in general position: no input 
 %				vector can be identically 0, no two input vectors can be parallel, and no
 %				three input vectors can be linearly dependent.  The parallelepipeds are 
-%				those whose vertices are all nodes, that is linear combinations of the 
+%				those whose vertices are all nodes, that is, linear combinations of the 
 %				generating vectors with all coefficients either 0 or 1.
 %
 % Description	A zonohedron is the set of all linear combinations of a set of generating
 %				vectors, such that the coefficients of any linear combination is between
 %				0 and 1, inclusive.  A zonohedron is a convex polytope.  Each edge of the
 %				zonohedron is a translation of one of the generating vectors.  Each face 
-%				of the zonohedron is a parallelogram.  The coefficients of the linear
-%				combinations that make up the vertices are all either 0 or 1.  
+%				of the zonohedron is a parallelogram.  This structure makes it natural to
+%				dissect a zonohedron into parallelepipeds.  To help in such dissections,
+%				this routine finds all the parallelepipeds whose vertices are nodes (a
+%				node is the sum of a discrete subset of the generating vectors; in other
+%				words, a node is a linear combination of generating vectors, each of whose
+%				coefficients is either a 0 or a 1).  
 %
-%				This routine 
+%				Each parallelepiped has an originating or offset vector.  The originating
+%				vector is a node, so it is a sum of generating vectors.  All the sides of
+%				a parallelepiped are translations of three generating vectors, which are
+%				different from the generating vectors that make up the originating vector.
+%				A point in the parallelepiped is a linear combination of the originating
+%				vector and the three side vectors, such that the combination coefficients
+%				for the side vectors are between 0 and 1 inclusive.    
 %
-%				GeneratingVectors	A set of three-dimensional vectors in the positive octant.  The
-%									zero vector is not allowed, and not two vectors may be parallel.
+%				The routine uses a simple exhaustive algorithm.  First, all possible nodes
+%				are calculated (these correspond to the power set of the set of generating
+%				vectors).  Each node is considered as a possible originating vector.  To
+%				be an originating vector, there must be at least three other generating
+%				vectors, which are not used in making the originating vector.  For each node,
+%				there is a set of remaining vectors, which are not used in making the node.
+%				If that node is an originating vector, then the three side vectors must be
+%				drawn from the set of remaining vectors.  All combinations of three vectors,
+%				drawn from the set of remaining vectors, are found; each threesome gives a
+%				possible parallelepiped, when combined with the originating vectors.
 %
-%				Vertices			A three-column matrix.  Each row gives the three-dimensional
-%									coordinates of a vertex of the generated zonohedron.
+%				This routine finds all possible parallelepipeds, with no regard to whether
+%				the parallelepipeds dissect the zonohedron.  In fact, it is expected that
+%				many parallelepipeds will overlap.
 %
-%				Edges				A two-column matrix.  Each row gives an edge of the generated
-%									zonohedron.  The entries of the matrix refer to the rows of the
-%									Vertices matrix.  For example, the row [5,7] in the Edges matrix
-%									means that the zonohedron contains an edge between the 5th and
-%									7th rows (each of which is the three-dimensional coordinates of
-%									a vertex) in the Vertices matrix.
+%				NumberOfGeneratingVectors	The number of generating vectors.
 %
-%				Faces				A four-column matrix.  Each row gives a face of the generated
-%									zonohedron.  The entries of the matrix refer to the rows of the
-%									Vertices matrix.  For example, the row [5,7,3,2] in the Edges 
-%									matrix means that the zonohedron contains a face whose vertices
-%									are the 5th, 7th, 3rd, and 2nd rows of the Vertices matrix.  The
-%									vertices are listed in either clockwise or counterclockwise
-%									order, for easy plotting.  
-%
-%				VertexCoefficients	Each vertex is a linear combination of the generating vectors.
-%									The ith row of the matrix VertexCoefficients gives the
-%									coefficients of the generating vectors for the ith vertex, which
-%									is given in the ith row of the matrix Vertices.
+%				AllParallelepipeds	A matrix which has a column for each generating 
+%							vector, and a row for each parallelepiped.  All the entries
+%							are either 0, 1, or -1.  Each row defines a parallelepiped.
+%							Three entries of each row are -1.  These identify the three
+%							generating vectors that make up the sides of the parallelepiped.
+%							The remaining entries are either 0 or 1, and are the coefficients
+%							of the linear combination that makes up the originating vector.
 %
 % Author		Paul Centore (March 30, 2014)
+% Revised		Paul Centore (May 3, 2014)
+%				---Updated documentation.
 %
 % Copyright 2014 Paul Centore
 %
@@ -61,7 +72,12 @@ function [AllParallelepipeds] = AllParallelepipedsInZonohedron(NumberOfGeneratin
 %    You should have received a copy of the GNU General Public License
 %    along with MunsellAndKubelkaMunkToolbox.  If not, see <http://www.gnu.org/licenses/>.
 
+% Find all possible nodes.  Each subset in the power set of generating vectors gives a node.
 CoefficientsOfNodes = powerset(1:NumberOfGeneratingVectors)	;
+% Make a matrix, with one row for each node.  Each matrix entry is either a 0 or 1.  The
+% node for each row is made by treating the row entries as coefficients in a linear
+% combination of generating vectors.  Equivalently, we could just sum up the generating
+% vectors whose columns have a 1.
 NumberOfNodes       = size(CoefficientsOfNodes,2)			;
 Nodes               = []									;
 for ctr = 1:NumberOfNodes
@@ -69,22 +85,25 @@ for ctr = 1:NumberOfNodes
     LineForNodes(CoefficientsOfNodes{1,ctr}) = 1;
     Nodes =[Nodes; LineForNodes]	;
 end
-Nodes
  
+% Consider each node as a possible originating vector for parallelepipeds.  The side-generating
+% vectors would then be threesomes of the vectors which do not contribute to the originating
+% vector.  Find all such threesomes that exist, for each originating vector.
 AllParallelepipeds = []	;
 for ctr = 1:NumberOfNodes
 	ElementsInSubset  = CoefficientsOfNodes{1,ctr}								;
 	RemainingElements = setdiff(1:NumberOfGeneratingVectors, ElementsInSubset) 	;
 	NumberOfRemainingElements = length(RemainingElements) 						;
+	% Find threesomes, if any exist, of the vectors that do not contribute to the node.
 	if NumberOfRemainingElements >= 3
 		Triplets = combinator(NumberOfRemainingElements,3,'c')	;
 		NumberOfTriplets = size(Triplets,1)						;
+		% For each threesome of side vectors, add a row to the list of all parallelepipeds.  
+		% Place a -1 in the entries for the side vectors.
 		for idx = 1:NumberOfTriplets
-%			Threesome = RemainingElements(Triplets(idx,1))		;
 			LineInAllParallelepipeds = Nodes(ctr,:) 			;
 			LineInAllParallelepipeds(RemainingElements(Triplets(idx,:))) = -1 ;
 			AllParallelepipeds = [AllParallelepipeds; LineInAllParallelepipeds]	;
 		end
 	end
 end
-AllParallelepipeds

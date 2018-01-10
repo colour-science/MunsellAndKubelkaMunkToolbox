@@ -11,17 +11,18 @@ function ConcatenateColorMunkiCSVFiles(ListOfColorMunkiCSVfiles, NameForConcaten
 %				the concatenated file is the same header line that appears in each individual file.
 %
 % Inputs		ListOfColorMunkiCSVfiles	A list (using {}) of strings, which are the filenames
-%											of the ColorMunki .csv files to be averaged.  Each
-%											file should have the same number of samples, and should be
-%											in ColorMunki .csv format
+%											of the ColorMunki .csv files to be concatenated.  Each
+%											file should be in ColorMunki .csv format
 %
 %				NameForConcatenatedFile		The name (as a string) for the concatenated file
 %
 % Author		Paul Centore (October 7, 2012)
 % Revision		Paul Centore (August 31, 2013)  
 %				 ---Moved from MunsellToolbox program to MunsellAndKubelkaMunkToolbox.
+% Revision		Paul Centore (May 7, 2014)  
+%				 ---Corrected some documentation.
 %
-% Copyright 2012 Paul Centore
+% Copyright 2012-2014 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %

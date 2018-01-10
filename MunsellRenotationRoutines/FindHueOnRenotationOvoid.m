@@ -98,8 +98,12 @@ function [x y Status] = FindHueOnRenotationOvoid(MunsellSpec)
 %				 ---Moved from MunsellToolbox program to MunsellAndKubelkaMunkToolbox.
 % Revision		Paul Centore (Jan. 1, 2014)  
 %				 ---Replaced call to IlluminantCWhitePoint with call to roo2xy (from OptProp).
+% Revision		Paul Centore (Aug. 18, 2015)  
+%				 ---Moved hue threshold to its own line, and added explanation.
+% Revision		Paul Centore (February 11, 2017)  
+%				 ---Replaced | with || to avoid short-circuit warnings
 %
-% Copyright 2010, 2012, 2014 Paul Centore
+% Copyright 2010-2017 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -127,6 +131,10 @@ Status.Messages = {'Success',...
 x          = -99;
 y          = -99;
 Status.ind = -99;
+
+% Set a threshold for hue.  If an input hue is within this distance of a standard hue
+% (one prefixed by 0, 2.5, 5, 7.5, or 10), it will be rounded to that standard hue
+threshold = 0.000000001;		% 0.001 was used before August 2015
 
 % The input could be either a Munsell string, such as 4.2R8.1/5.3,
 % or a Munsell vector in ColorLab format.  Determine which, and convert
@@ -157,7 +165,7 @@ end
 % Check that the Munsell value of the input is an integer between 1 and 9
 % (If the value is 10, then the colour is ideal white, which was previously assgined
 % the xy coordinates for Illuminant C.)
-if Value < 1 | Value > 9
+if Value < 1 || Value > 9
    Status.ind = 2;		% Set error and return
    return
 end
@@ -187,11 +195,10 @@ Chroma = 2*round(Chroma/2)	;
 % Check to see if the input colour is a standard Munsell colour, for which
 % renotation data is available without interpolation.  If so, make the
 % renotation conversion and return
-threshold = 0.001;
-if abs(HueNumber) < threshold |...   
-  abs(HueNumber-2.5) < threshold |...
-  abs(HueNumber-5) < threshold |...
-  abs(HueNumber-7.5) < threshold |...
+if abs(HueNumber) < threshold ||...   
+  abs(HueNumber-2.5) < threshold ||...
+  abs(HueNumber-5) < threshold ||...
+  abs(HueNumber-7.5) < threshold ||...
   abs(HueNumber-10) < threshold
   HueNumber = 2.5 * round(HueNumber/2.5)	;	% Round to very close standard hue
   [x y Y StatusCode] = MunsellToxyYfromExtrapolatedRenotation(ColorLabMunsellVector);	
@@ -215,8 +222,8 @@ CLHueLetterIndexPlus  = CtrClockwiseHue(2)	;
 
 % Express the two bounding Munsell colours in ColorLab Munsell vector format, and
 % in ASTM format
-CLMVMinus    = [MunsellHueNumberMinus, Value, Chroma, CLHueLetterIndexMinus]			;
-CLMVPlus     = [MunsellHueNumberPlus, Value, Chroma, CLHueLetterIndexPlus]		;
+CLMVMinus    = [ClockwiseHue(1), Value, Chroma, ClockwiseHue(2)]			;
+CLMVPlus     = [CtrClockwiseHue(1), Value, Chroma, CtrClockwiseHue(2)]		;
 
 % Find the achromatic point, to be used as the center of polar coordinates
 [xGrey yGrey YGrey StatusCode] = MunsellToxyYfromExtrapolatedRenotation([Value]);

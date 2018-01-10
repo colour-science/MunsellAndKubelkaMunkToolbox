@@ -34,20 +34,24 @@ wavelengths = 400:10:700	;
 
 % Start a figure, on which a selection of illuminants can be displayed
 figure
-YAxisAdjustment = 400		;	% Use this to scale the Y-axis to make a pleasing plot
+YAxisAdjustment = (10/27)*400		;	% Use this to scale the Y-axis to make a pleasing plot
 
 % Select illuminants from the following options, by choosing 'if true' or 'if false'
 % for individual illuminants.
 if true
 	IllA = illuminant('A', wavelengths)	;
 	IllA = IllA/sum(IllA)				;
+wavelengths
+YAxisAdjustment * IllA
 	plot(wavelengths, YAxisAdjustment * IllA, 'k-')
 	hold on
 end
 
-if true
+if false
 	IllC = illuminant('C', wavelengths)	;
 	IllC = IllC/sum(IllC)				;
+wavelengths
+YAxisAdjustment * IllC
 	plot(wavelengths, YAxisAdjustment * IllC, 'k-')
 	hold on
 end
@@ -70,7 +74,7 @@ if false
 	hold on
 end
 
-if true
+if false
 	IllF11 = illuminant('F11',wavelengths)	;
 	IllF11 = IllF11/sum(IllF11)				;
 	plot(wavelengths, YAxisAdjustment * IllF11, 'k-')
@@ -84,8 +88,10 @@ if false
 	text(606, 83, 'F11')	;
 end
 
+set(gca,'ylim', [0 10])
+
 % Save the plot
-figname = 'IlluminantsPlot'			 ;
+figname = 'IlluminantsPlotA'			 ;
 set(gcf, 'Name', figname)
 print(gcf, [figname,'.eps'], '-deps');
 print(gcf, [figname,'.png'], '-dpng');

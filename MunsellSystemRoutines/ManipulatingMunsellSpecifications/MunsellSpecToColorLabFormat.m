@@ -45,8 +45,14 @@ function ColorLabMunsellVector = MunsellSpecToColorLabFormat(MunsellSpecString);
 %				 ---Moved from MunsellConversions program to MunsellToolbox.
 % Revision		Paul Centore (August 31, 2013)  
 %				 ---Moved from MunsellToolbox program to MunsellAndKubelkaMunkToolbox.
+% Revision		Todd Stantz (September 17, 2015)  
+%				 ---Corrected MunsellHueLetterDesignator to ColorLabHueLetterDesignator for 
+%					hues prefixed with 0
+% Revision		Paul Centore (September 17, 2015)  
+%				 ---Corrected case in which mod(x,10) returned 0 instead of 10, when x was 10; 
+%					 x is a hue letter designator, so it must be between 1 and 10 inclusive
 %
-% Copyright 2010, 2012 Paul Centore
+% Copyright 2010-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -91,11 +97,11 @@ while isdigit(entry) == TRUE || strcmp(entry,'.') == TRUE
 end
 MunsellHueNumber = str2num(MunsellString(1:(ctr-1)))	;
 
-% Next, extract hue letter designator 
-% entry is 1st letter of Munsell Hue Designator, which might consist of two letters
+% Next, extract the hue letter designator.  The next
+% entry is the first letter of Munsell Hue Designator, which might consist of two letters
 PossibleNextLetter = MunsellString(ctr+1);
 ColorLabHueLetterDesignator = -99;	% Default error value
-if ~isdigit(PossibleNextLetter)
+if ~isdigit(PossibleNextLetter)	% Hue designator consists of two letters
    MunsellHueLetterDesignator = MunsellString(ctr:(ctr+1));
    if strcmp(MunsellHueLetterDesignator,'BG')  == TRUE
       ColorLabHueLetterDesignator = 2;
@@ -111,7 +117,7 @@ if ~isdigit(PossibleNextLetter)
       disp(['ERROR1: ',MunsellHueLetterDesignator,' is not a valid hue letter designator']);
    end
    ctr = ctr + 1;
-else
+else			% Hue designator consists of one letter
    MunsellHueLetterDesignator = MunsellString(ctr);
    if strcmp(MunsellHueLetterDesignator,'B')  == TRUE
       ColorLabHueLetterDesignator = 1;
@@ -132,8 +138,16 @@ end
 % hue as 10R.  ColorLab format uses 10 instead of 0, in the naming of Munsell data files.
 % To be consistent with ColorLab format, change 0 to 10, and adjust the hue designator.
 if MunsellHueNumber == 0
-   MunsellHueNumber           = 10										;
+   MunsellHueNumber            = 10											;
+   % The following line was changed on September 17, 2015: MunsellHueLetterDesignator was
+   % corrected to ColorLabHueLetterDesignator (two instances)
    ColorLabHueLetterDesignator = mod(ColorLabHueLetterDesignator + 1, 10)	;
+   
+   % The mod(designator+1,10) function will have returned 0 if designator is 9.  In that case, 
+   % correct the result so that the designator is 10 rather than 0 (added September 17, 2015)
+   if ColorLabHueLetterDesignator == 0
+      ColorLabHueLetterDesignator = 10	;
+   end  
 end
 
 % Remainder of Munsell specification string is value and chroma

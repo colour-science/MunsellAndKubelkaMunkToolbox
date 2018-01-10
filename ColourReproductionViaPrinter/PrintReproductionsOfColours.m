@@ -1,5 +1,10 @@
 function [RGBresults, FinalWavelengths] = ...
-          PrintReproductionsOfColours(AimPointsxyY, DEthreshold, IllumObs, Name, ShadeBankFile);
+          PrintReproductionsOfColours(AimPointsxyY, ...
+									  DEthreshold, ...
+									  IllumObs, ...
+									  Name, ...
+									  StandardNames, ...
+									  ShadeBankFile);
 % Purpose		Determine the RGBs needed to match a set of input aimpoints, under an input
 %				illuminant and observer.  The RGBs will be specific to the printer used to
 %				print the colour matches.
@@ -51,6 +56,10 @@ function [RGBresults, FinalWavelengths] = ...
 %								lines give RGB components, followed by reflectances.  This input
 %								argument is optional
 %
+%				StandardNames	A list, indicated by {}, of names of the standards to be
+%								reproduced.  This input can be empty, in which case the standards
+%								will be named 'Sample 1,' 'Sample 2,' and so on
+%
 %				RGBresults		A matrix of information about the success of matching, including
 %								RGBs that correspond to the xyY aimpoints
 %
@@ -58,6 +67,17 @@ function [RGBresults, FinalWavelengths] = ...
 %									RGBresults
 %
 % Author		Paul Centore (January 1, 2014)
+% Revision		Paul Centore (May 7, 2014)
+%				---Added second output figure of best matches, even if they are outside the threshold
+% Revision		Paul Centore (September 5, 2014)
+%				---The user is not prompted for an initial shade bank file, if one already exists
+% Revision		Paul Centore (September 25, 2014)
+%				---Replaced -deps printing option with -depsc, so that colours are handled correctly
+%				---Added new input variable, StandardNames, 
+%				---At the end, the routine now prints out the best matches found, with DEs, in a graphic.
+%				   This replaces the previous graphic, which did not display standard names or DEs
+% Revision		Paul Centore (December 15, 2014)
+%				---The length and width of printouts is now set once at the start of the file
 %
 % Copyright 2014 Paul Centore
 %
@@ -106,16 +126,16 @@ AimPointResults(:,15:17)	= AimPointsLab						;
 % the user to print and measure colour samples.  When running the program, of course,
 % the pauses are necessary.  Set the following flag to "false" to disable the pauses, 
 % for testing.
-UsePauses = true	;	
+UsePauses = false	;	
 
 % The initial shade bank will be considered the first iteration.  Set a 
 % maximum number of iterations, after which the algorithm automatically terminates.
 iteration     = 1				;
-MaxIterations = 8				;
+MaxIterations = 4				;
 
 % If desired, display a histogram of the best DEs achieved at various points in the
 % algorithm.
-DisplayBestDEHistogram = true		;
+DisplayBestDEHistogram = false		;
 
 % If desired, display a histogram of edge lengths (in CIE DE 2000 values) after
 % each tessellation, to monitor progress.
@@ -133,20 +153,25 @@ for ctr = 1:length(IllumObs)
 	end
 end
 
+% Set the size of samples on printed pages of colours
+PatchesDown   = 15	;	%14	;
+PatchesAcross = 12	;	%10	;
+
 % Create an initial shade bank.  If a shade bank is already available,
 % then that can be used by calling it [Name,'Iteration1.csv'], and placing
 % it in the current directory.  If the user has input a shade bank file to be used
 % as a starting point, then convert it to .csv format, and call the file
 % [Name,'Iteration1.csv'].  Also extract the list of RGBs from the file.
+CSVfileName = [Name,'Iteration1.csv'] 	;
 if exist('ShadeBankFile')
-    RGB = ProcessInitialShadeBankFile(ShadeBankFile, [Name,'Iteration1.csv']);
+    RGB = ProcessInitialShadeBankFile(ShadeBankFile, [Name,'Iteration1.csv'])	;
 else % No shade bank file was input, so create it from measurements of a set of RGBs
     % Choose a lattice of RGB colours for the initial shade bank.  NumOfDiv refers
     % to the number fo evenly spaced R, G, and B values.  If NumOfDiv is 10 (which is
     % usually sufficient), then there will be 1000 (which equals 10^3) RGB triples
     % in the lattice.  Since most computer programs store an RGB as 3 bytes, and a byte
     % has 256 values, round the lattice entries to the nearest integer multiple of 1/255.
-    NumOfDiv = 30											;
+    NumOfDiv = 16											;
     CombsWithRepetition = combinator(NumOfDiv, 3, 'p', 'r')	;
     RGB = (1/(NumOfDiv-1))*(CombsWithRepetition-1)			;
     RGB = (1/255) * round(255 * RGB)						;	
@@ -156,72 +181,74 @@ else % No shade bank file was input, so create it from measurements of a set of 
     % step if the colours to be displayed have already been printed and measured.
     OutputFile = [Name,'Iteration1.csv']			;
     if isempty(which(OutputFile))
-        PrintRGBs(RGB, [Name,'ShadeIteration1'])	;
+%        PrintRGBs(RGB, [Name,'ShadeIteration1'], PatchesDown, PatchesAcross)	;
     end
+
+	% During the pause, print the figure using the printer and paper of interest.
+	% Then measure the printed colours with a spectrophotometer, in the same order in
+	% which they appear in the matrix InterpolatedRGBinGamut.  If the spectrophotometer is a
+	% ColorMunki, then click File:Export on the ColorMunki
+	% window, and choose "Comma separated" as the file type.  Export to a
+	% file named "Iteration_x_.csv" in the current directory, where _x_ is the current iteration.
+	% If the spectrophotometer is an i1i0 AST, equipped with an i1Pro2, then save to a file
+	% named "Iteration_x_Curr_M2.txt" in the current directory.  This file will then be
+	% converted to a .csv file in ColorMunki format.
+	disp(['During the pause, print the figure using the printer and paper of interest.'])	;
+	disp(['The printed colours establish a shade bank of colours that will be used for matching.'])	;
+	disp(['Measure the printed colours in the order in which they appear.  Use either a ColorMunki,'])	;
+	disp(['or an i1i0 Automatic Scanning Table (AST), equipped with an i1Pro2 spectrophotometer.']);
+	disp(['If using the AST with the i1Pro2, there should be ',num2str(size(RGB,1))]);
+	disp(['colours in the saved .txt file.  When saving, choose 0.0 to 1.0 as the reflectance range, and']);
+	disp(['a decimal point as a separator.  Export to a file named "',Name,'Iteration',num2str(iteration),'Curr_M2.txt"']);
+	disp(['in the current directory.  (The i1i0 will automatically append _M2 to the chosen file name.)']); 
+	disp(['If the printed samples are measured with a ColorMunki, then there should be']) 
+	disp([num2str(size(RGB,1)),' colours in the ColorMunki folder.  ',...
+		  'Click File:Export on the ColorMunki'])	;
+	disp(['window, and choose "Comma separated" as the file type.  Export to a'])	;
+	disp(['file named "',Name,'Iteration',num2str(iteration),'.csv" in the current directory.  Once the file is saved,'])	;
+	disp(['press the "y" key (or any other key) to resume the program.'])					;
+	temp = fflush(stdout);
+	if UsePauses
+		pause()										;
+	end
+			
+	% The measurement data will be stored in a CSV file whose name is in the string
+	% variable CSVfileName.	
+	% If the colours were measured with a ColorMunki, then they will have been stored
+	% directly in such a file.  If they were measured with an i1i0, equipped with an i1Pro2
+	% spectrophotometer, then the measurements will have been stored in a file of a different
+	% format, which must be converted to a .csv format.
+	% Check whether a .csv file has already been saved by the user.  If not, convert the
+	% i1i0 file to .csv format. 
+	if isempty(which(CSVfileName))
+		% Convert an i1i0 .txt file
+		NewFileName = [Name,'Iteration',num2str(iteration),'Curr_M2.txt']	;
+		[EntriesGreaterThan1, EntriesLessThan0] = ...
+		   i1i02txtFileToColorMunkiCSVFormat(NewFileName)	;
+		ListOfColorMunkiCSVfiles{1} = [NewFileName(1:(end-3)),'csv']	;
+		% Since there is only one file, the following 'concatenation' just makes a copy of 
+		% that file, with a different name
+		ConcatenateColorMunkiCSVFiles(ListOfColorMunkiCSVfiles, CSVfileName);
+	end
 end
 
-% During the pause, print the figure using the printer and paper of interest.
-% Then measure the printed colours with a spectrophotometer, in the same order in
-% which they appear in the matrix InterpolatedRGBinGamut.  If the spectrophotometer is a
-% ColorMunki, then click File:Export on the ColorMunki
-% window, and choose "Comma separated" as the file type.  Export to a
-% file named "Iteration_x_.csv" in the current directory, where _x_ is the current iteration.
-% If the spectrophotometer is an i1i0 AST, equipped with an i1Pro2, then save to a file
-% named "Iteration_x_Curr_M2.txt" in the current directory.  This file will then be
-% converted to a .csv file in ColorMunki format.
-disp(['During the pause, print the figure using the printer and paper of interest.'])	;
-disp(['The printed colours are attempted matches for some of the input aimpoints.'])	;
-disp(['Measure the printed colours in the order in which they appear.  Use either a ColorMunki,'])	;
-disp(['or an i1i0 Automatic Scanning Table (AST), equipped with an i1Pro2 spectrophotometer.']);
-disp(['If using the AST with the i1Pro2, there should be ',num2str(size(RGB,1))]);
-disp(['colours in the saved .txt file.  When saving, choose 0.0 to 1.0 as the reflectance range, and']);
-disp(['a decimal point as a separator.  Export to a file named "',Name,'Iteration',num2str(iteration),'Curr_M2.txt"']);
-disp(['in the current directory.  (The i1i0 will automatically append _M2 to the chosen file name.)']); 
-disp(['If the printed samples are measured with a ColorMunki, then there should be']) 
-disp([num2str(size(RGB,1)),' colours in the ColorMunki folder.  ',...
-      'Click File:Export on the ColorMunki'])	;
-disp(['window, and choose "Comma separated" as the file type.  Export to a'])	;
-disp(['file named "',Name,'Iteration',num2str(iteration),'.csv" in the current directory.  Once the file is saved,'])	;
-disp(['press the "y" key (or any other key) to resume the program.'])					;
-temp = fflush(stdout);
-if UsePauses
-    pause()										;
-end
-			
-% The measurement data will be stored in a CSV file with the following name:	
-CSVfileName = [Name,'Iteration',num2str(iteration),'.csv'] 	;
-% If the colours were measured with a ColorMunki, then they will have been stored
-% directly in such a file.  If they were measured with an i1i0, equipped with an i1Pro2
-% spectrophotometer, then the measurements will have been stored in a file of a different
-% format, which must be converted to a .csv format.
-% Check whether a .csv file has already been saved by the user.  If not, convert the
-% i1i0 file to .csv format. 
-if isempty(which(CSVfileName))
-    % Convert an i1i0 .txt file
-    NewFileName = [Name,'Iteration',num2str(iteration),'Curr_M2.txt']	;
-    [EntriesGreaterThan1, EntriesLessThan0] = ...
-       i1i02txtFileToColorMunkiCSVFormat(NewFileName)	;
-    ListOfColorMunkiCSVfiles{1} = [NewFileName(1:(end-3)),'csv']	;
-    % Since there is only one file, the following 'concatenation' just makes a copy of 
-    % that file, with a different name
-    ConcatenateColorMunkiCSVFiles(ListOfColorMunkiCSVfiles, CSVfileName);
-end
- 
 % Each printed RGB specification will have a reflectance spectrum, which has been
 % measured by the spectrophotometer.  By assuming the input illuminant and
 % observer, convert the reflectance spectrum to  an xyY.  
 % First, extract the reflectance data
-[Wavelengths, NewReflectances] = ColorMunkiCSVfileToOctaveFormat(CSVfileName);
-% Then, extract xyY and XYZ values from the reflectance data
-CIEcoords = ReflectancesToCIEwithWhiteY100(Wavelengths, NewReflectances, IllumObs);
+[Wavelengths, Reflectances] = ColorMunkiCSVfileToOctaveFormat(CSVfileName);
+% Then, extract xyY, XYZ, and Lab values from the reflectance data
+CIEcoords = ReflectancesToCIEwithWhiteY100(Wavelengths, Reflectances, IllumObs);
+size(CIEcoords)
 XYZ = CIEcoords(:,1:3)										;
 xyY = CIEcoords(:,4:6)										;
+WhitePointXYZ = WhitePointWithYEqualTo100(IllumObs);
+Lab = xyz2lab(XYZ, WhitePointXYZ)	;
 	
 % Collate all the data into a shade bank
-ShadeBankData = [RGB, xyY, NewReflectances]		;
-	
-% Then, save the shade bank data in a file called 'ShadeBank'
-ShadeBankFileName = [Name,IllumObsNoSlashes,'ShadeBank.txt']			;
+ShadeBankData = [RGB, xyY, Reflectances]	;
+% Then, save the shade bank data in a file 
+ShadeBankFileName = [Name,'ShadeBank.txt']	;
 output_fid = fopen(ShadeBankFileName, 'w')	;
 % The first line of a shade bank file is fixed, so it is written directly to the file
 FirstOutputLine = ['R,G,B,380 nm,390 nm,400 nm,410 nm,420 nm,430 nm,440 nm,',...
@@ -231,17 +258,7 @@ FirstOutputLine = ['R,G,B,380 nm,390 nm,400 nm,410 nm,420 nm,430 nm,440 nm,',...
 fprintf(output_fid, '%s\n', FirstOutputLine);				   
 fclose(output_fid)							;
 dlmwrite(ShadeBankFileName, ShadeBankData(:,[1:3,7:end]), ',', '-append')	;
-[NumOfColInShadeBank,~] = size(ShadeBankData)					;
-
-% Express shade bank data in XYZ and Lab as well as xyY
-XYZ = []					;
-[row,~] = size(xyY)			;
-for ind = 1:row
-    [X Y Z] = xyY2XYZ(xyY(ind,1), xyY(ind,2), xyY(ind,3))	;
-    XYZ = [XYZ; X Y Z]		;
-end
-WhitePointXYZ = WhitePointWithYEqualTo100(IllumObs);
-Lab = xyz2lab(XYZ, WhitePointXYZ)	;
+[NumOfColInShadeBank,~] = size(ShadeBankData)				
 
 [NumOfInitialDataPoints,~] = size(RGB)		;
 
@@ -252,8 +269,9 @@ DEprogress = -99 *ones(NumberOfAimPoints,MaxIterations)	;
 
 % Count the number of RGB entries in the original shade bank data
 [NumOfOrigRGBs,~] = size(RGB)	
-fflush(stdout);
 
+disp(['starting tessellation']); fflush(stdout);
+tic();
 % If interpolation calculations have not already been run, then run them.  After running them.
 % save off the results in a file, to avoid repeating them if the identical
 % program is run again.  If such a file was saved from a previous run, then just load it.
@@ -272,9 +290,29 @@ if isempty(which(FileForSaving))
     dlmwrite([Name,'ShadeBankTessellation.txt'], tessellation, ',')				;
     save('-v7', FileForSaving, 'AllInterpolatedRGB', 'RGBvertices', 'XYZvertices',...
 	 'AllBaryCoords', 'tessellation','Labvertices');
+	 
+	ShadeBankTessellationFileName = [Name,'ShadeBankTessellation.mat']			;
+	save('-v7', ShadeBankTessellationFileName, 'tessellation')	;
 else
 	load(FileForSaving)
 end
+ElapsedTime = toc()			;
+disp(['Time for tessellation: ',num2str(ElapsedTime/60),' minutes'])
+fflush(stdout);
+
+% Make a Boolean vector, indicating which aimpoints are out of gamut
+OutOfGamut     = []	;
+InGamutIndices = [] ;
+for APctr = 1:NumberOfAimPoints
+	if AllInterpolatedRGB(APctr,1) == -99
+		OutOfGamut(APctr) = true 	;
+	else
+		OutOfGamut(APctr) = false 	;
+		InGamutIndices    = [InGamutIndices; APctr]	;
+	end
+end
+%sizeOOG = size(OutOfGamut)
+NumberInGamut = length(InGamutIndices)
 
 TessellationSize = size(tessellation)    ;
 disp([' ']);
@@ -283,6 +321,66 @@ fflush(stdout)	;
 
 if DisplayEdgeLengthHistogram
     DisplayEdgeLengthsOfTessellation(tessellation, XYZ, Name, iteration);
+end
+
+% The code currently found tetrahedra that contain aimpoints, but those tetrahedra might
+% be very large.  This next block code looks for smaller tetrahedra, if they exist.
+FileForSaving = [Name,'InitialSmallTetrahedraData.mat']		;
+if isempty(which(FileForSaving))
+	disp(['about to call Tetrahedron routine'])
+	[SmallTetrInterpolatedRGB, ...
+	 SmallTetrRGBvertices, ...
+	 SmallTetrLabVertices, ...
+	 SmallTetrAllBaryCoords, ...
+	 SmallTetrminDE2000, ...
+	 SmallTetrminRGB, ...
+	 SmallTetrTetrahedronDEs] = ...
+          FindSmallEnclosingTetrahedron(RGB, Lab, AimPointsLab, OutOfGamut)	;
+	 [~,NumOfCells] = size(SmallTetrLabVertices)			
+	 SmallTetrXYZvertices = {}							;
+	 for ind = 1:NumOfCells
+    	 WhitePointXYZ = WhitePointWithYEqualTo100(IllumObs);
+	     SmallTetrXYZvertices{ind} = lab2xyz(SmallTetrLabVertices{ind}, WhitePointXYZ);
+	 end
+
+	 save('-v7', FileForSaving, 'SmallTetrInterpolatedRGB', 'SmallTetrRGBvertices', ...
+	     'SmallTetrXYZvertices', 'SmallTetrAllBaryCoords', 'SmallTetrLabVertices', ...
+	     'SmallTetrminDE2000', 'SmallTetrminRGB', 'SmallTetrTetrahedronDEs');
+else
+ 	load(FileForSaving)
+end
+
+if DisplayInternalDEHistogram
+    % Print histogram showing DEs between aimpoints and vertices of enclosing tetrahedra
+    figure
+    set(gcf, 'Name', ['Initial DEs from small enclosing tetrahedra'])
+    EdgeVector = [0:1:50,1000];
+    AllSTtetrDEs = reshape(SmallTetrTetrahedronDEs, 4*size(SmallTetrTetrahedronDEs,1), 1)	;
+    [Counts] = histc(AllSTtetrDEs, EdgeVector)	;
+    HistogramData = [EdgeVector; reshape(Counts, 1, length(Counts))]	;
+    stairs(EdgeVector, Counts)		;
+    set(gca, 'xlim', [0,25])				;
+    figname = [Name,'HistInternalDEInitialSmallTetrahedra']	;
+    print(gcf, [figname,'.eps'], '-depsc')	;
+    print(gcf, [figname,'.png'], '-dpng')	;
+    print(gcf, [figname,'.jpg'], '-djpg')	;
+    print(gcf, [figname,'.pdf'], '-dpdf')	;
+end
+
+if DisplayBestDEHistogram
+    % Print histogram showing minimum DEs between aimpoints and nearest RGB point
+    figure
+    set(gcf, 'Name', ['Initial minimum DEs'])
+    EdgeVector = [0:1:50,1000];
+    [Counts] = histc(SmallTetrminDE2000, EdgeVector)	;
+    HistogramData = [EdgeVector; reshape(Counts, 1, length(Counts))]	;
+    stairs(EdgeVector, Counts)		;
+    set(gca, 'xlim', [0,25])				;
+    figname = [Name,'HistMinDEInitialSmallTetrahedra']	;
+    print(gcf, [figname,'.eps'], '-depsc')	;
+    print(gcf, [figname,'.png'], '-dpng')	;
+    print(gcf, [figname,'.jpg'], '-djpg')	;
+    print(gcf, [figname,'.pdf'], '-dpdf')	;
 end
 
 iteration = 2	;
@@ -304,9 +402,45 @@ for indx = 1:NumberOfAimPoints
 	% Save off some fields in the InfoSummary structure
 	tempstruct             = {}								;
 
-	% If values in the interpolation for aimponts are -99, then that aimpoint is not
+
+	% Start code addition by Paul Centore (Spet. 26, 2014)
+	%	Check where the aimpoint is in relation to the shade bank.  Check first if a small
+	%	enclosing tetrahedron has been found around the aimpoint.  Barring that, check whether
+	%	the aimpoint is inside the shade bank gamut, in which case an enclosing tetrahedron
+	%	(though likely a large one) can be found.  Finally, the aimpoint might be outside the
+	%   gamut completely.  
+	if SmallTetrInterpolatedRGB(indx,1) ~= -99
+		% Save off indices where an aimpoint is enclosed in a small tetrahedron
+		MstrIdForRGBattempts      = [MstrIdForRGBattempts, indx]	;
+		
+		% Save off some fields 
+		ProgMatrix                = -99 * ones(1,8)							;
+		ProgMatrix(1,1:3)         = SmallTetrInterpolatedRGB(indx,:)		;
+		tempstruct.progress       = ProgMatrix								;
+		tempstruct.RGBvertices{1} = SmallTetrRGBvertices{indx}				;
+		tempstruct.XYZvertices{1} = SmallTetrXYZvertices{indx}				;
+		tempstruct.Labvertices{1} = SmallTetrLabVertices{indx}				;
+		
+		% Store matrix with list of attempted tetrahedra, and DEs
+		tempmat = [SmallTetrRGBvertices{indx}, SmallTetrXYZvertices{indx}, ...
+				 -99*ones(4,1), ones(4,1), SmallTetrLabVertices{indx}]	;
+		tempmat = [tempmat; SmallTetrInterpolatedRGB(indx,:) -99*ones(1,8)];	
+		for DEctr = 1:4
+		    DE2000           = CIEDE2000ForXYZ(tempmat(DEctr,4:6), AimPointsXYZ(indx,:), WhitePointXYZ)	;
+			tempmat(DEctr,7) = DE2000								;
+			DEsInsideTetrahedra = [DEsInsideTetrahedra; DE2000]		;
+		end
+		tempmat(5,:) = [AllInterpolatedRGB(indx,:), -99*ones(1,8)]	; % Redundant line?
+		tempstruct.TetraProgress = tempmat			;
+	% Even if the aimpoint is not inside a small tetrahedron, it still might be in-gamut, in
+	% which case a (likely larger) containing tetrahedron has been found.  Check the gamut
+	% status by seeing if there is a return from the tessellation routine.
+	% End code addition by Paul Centore (Spet. 26, 2014)
+
+
+	% If values in the interpolation for aimponts are not -99, then that aimpoint is 
 	% in the gamut of RGB lattice, which approximates the printer gamut
-	if AllInterpolatedRGB(indx,1) ~= -99
+	elseif AllInterpolatedRGB(indx,1) ~= -99	% Changed from if to elseif on Sept. 26, 2014
 		% Save off indices where an aimpoint is in the printer gamut
 		MstrIdForRGBattempts      = [MstrIdForRGBattempts, indx]	;
 		
@@ -326,7 +460,7 @@ for indx = 1:NumberOfAimPoints
 			tempmat(DEctr,7) = DE2000								;
 			DEsInsideTetrahedra = [DEsInsideTetrahedra; DE2000]		;
 		end
-		tempmat(5,:) = [AllInterpolatedRGB(indx,:), -99*ones(1,8)]	;
+		tempmat(5,:) = [AllInterpolatedRGB(indx,:), -99*ones(1,8)]	; % Redundant line?
 		tempstruct.TetraProgress = tempmat			;
 	else		% That aimpoint is out of the printer gamut
 		AimPointResults(indx,8) = StatusOutOfGamut	;
@@ -344,7 +478,7 @@ if DisplayInternalDEHistogram
     stairs(EdgeVector, Counts)		;
     set(gca, 'xlim', [0,50])				;
     figname = [Name,'HistInternalDEIteration',num2str(iteration)]	;
-    print(gcf, [figname,'.eps'], '-deps')	;
+    print(gcf, [figname,'.eps'], '-depsc')	;
     print(gcf, [figname,'.png'], '-dpng')	;
     print(gcf, [figname,'.jpg'], '-djpg')	;
     print(gcf, [figname,'.pdf'], '-dpdf')	;
@@ -386,7 +520,8 @@ RGBAttempts = (1/255) * round(255*RGBAttempts)				;		% Round to nearest 8-bit in
 % step if the colours to be displayed have already been printed and measured.
 OutputFile = [Name,'Iteration2.csv']	;
 if isempty(which(OutputFile))
-    PrintRGBs(RGBAttempts, [Name,'Iteration',num2str(iteration)])		;
+    NumberOfPagesPrinted = PrintRGBs(RGBAttempts, [Name,'Iteration',num2str(iteration)], ...
+    									PatchesDown, PatchesAcross)		;
 end
 	
 % During the pause, print the figure using the printer and paper of interest.
@@ -403,9 +538,15 @@ disp(['The printed colours are attempted matches for some of the input aimpoints
 disp(['Measure the printed colours in the order in which they appear.  Use either a ColorMunki,'])	;
 disp(['or an i1i0 Automatic Scanning Table (AST), equipped with an i1Pro2 spectrophotometer.']);
 disp(['If using the AST with the i1Pro2, there should be ',num2str(length(RGBAttempts))]);
-disp(['colours in the saved .txt file.  When saving, choose 0.0 to 1.0 as the reflectance range, and']);
-disp(['a decimal point as a separator.  Export to a file named "',Name,'Iteration',num2str(iteration),'Curr_M2.txt"']);
-disp(['in the current directory.  (The i1i0 will automatically append _M2 to the chosen file name.)']); 
+%disp(['colours in the saved .txt file.  When saving, choose 0.0 to 1.0 as the reflectance range, and']);
+%disp(['a decimal point as a separator.  Export to a file named "',Name,'Iteration',num2str(iteration),'Curr_M2.txt"']);
+%disp(['in the current directory.  (The i1i0 will automatically append _M2 to the chosen file name.)']); 
+
+disp(['new colours measured in total.  When saving, choose 0.0 to 1.0 as the reflectance range, and']);
+disp(['a decimal point as a separator.  Export to a file named "',Name,'Iteration',num2str(iteration),'Currpgx_M2.txt"']);
+disp(['in the current directory, where the x in pgx refers to a page number, if the']);
+disp(['colours were printed on multiple pages.  (The i1i0 will automatically append _M2 to the chosen file name.)']); 
+
 disp(['If the printed samples are measured with a ColorMunki, then there should be']) 
 disp([num2str(NumOfColInShadeBank+length(MstrIdForRGBattempts)),' colours in the ColorMunki folder.  ',...
       'Click File:Export on the ColorMunki'])	;
@@ -425,15 +566,32 @@ CSVfileName = [Name,'Iteration',num2str(iteration),'.csv'] 	;
 % format, which must be converted to a .csv format.
 % Check whether a .csv file has already been saved by the user.  If not, convert the
 % i1i0 file to .csv format, and append it to the previous .csv file. 
-if isempty(which(CSVfileName))
+
+%if isempty(which(CSVfileName))
 % Add the latest measurements to a running file of measurements
-    NewFileName = [Name,'Iteration',num2str(iteration),'Curr_M2.txt']	;
-    [EntriesGreaterThan1, EntriesLessThan0] = ...
-       i1i02txtFileToColorMunkiCSVFormat(NewFileName)	;
-    ListOfColorMunkiCSVfiles{1} = [Name,'Iteration',num2str(iteration-1),'.csv']	;
-    ListOfColorMunkiCSVfiles{2} = [NewFileName(1:(end-3)),'csv']	;
-    ConcatenateColorMunkiCSVFiles(ListOfColorMunkiCSVfiles, CSVfileName);
- end
+%    NewFileName = [Name,'Iteration',num2str(iteration),'Curr_M2.txt']	;
+%    [EntriesGreaterThan1, EntriesLessThan0] = ...
+%       i1i02txtFileToColorMunkiCSVFormat(NewFileName)	;
+%    ListOfColorMunkiCSVfiles{1} = [Name,'Iteration',num2str(iteration-1),'.csv']	;
+%    ListOfColorMunkiCSVfiles{2} = [NewFileName(1:(end-3)),'csv']	;
+%    ConcatenateColorMunkiCSVFiles(ListOfColorMunkiCSVfiles, CSVfileName);
+% end
+
+if isempty(which(CSVfileName))
+	% Add the latest measurements to a running file of measurements
+	ListOfColorMunkiCSVfiles = {}	;
+	ListOfColorMunkiCSVfiles{1} = [Name,'Iteration',num2str(iteration-1),'.csv']	;
+	% The latest iteration might have been printed on multiple pages, so convert the
+	% saved file for each page to a ColorMunki .csv file, and then concatenate them.
+	for PageCtr = 1:NumberOfPagesPrinted
+		NewFileName = [Name,'Iteration',num2str(iteration),'Currpg',num2str(PageCtr),'_M2.txt']	;
+		[EntriesGreaterThan1, EntriesLessThan0] = ...
+		   i1i02txtFileToColorMunkiCSVFormat(NewFileName)	;
+		ListOfColorMunkiCSVfiles{end+1} = [NewFileName(1:(end-3)),'csv']	;
+	end
+	ConcatenateColorMunkiCSVFiles(ListOfColorMunkiCSVfiles, CSVfileName);     
+end
+
 
 % Add the number of printed colours to the number of attempted matches
 [NumOfPrintedSamples,~] = size(RGBAttempts)												;
@@ -454,6 +612,9 @@ NewxyY = CIEcoords(:,4:6)										;
 [NumOfOrigRGBs,~] = size(RGB)	;
 % Add the new data into the shade bank
 RGB = [RGB; RGBAttempts]		;
+%NewxyY = [xyY; NewxyY]	;
+%NewXYZ = [XYZ; NewXYZ]	;
+%NewReflectances = [Reflectances; NewReflectances]	;
 
 % Overwrite the previous shade bank file with augmented shade bank data	
 ShadeBankData = [RGB, NewxyY, NewReflectances]	;
@@ -516,11 +677,11 @@ if DisplayBestDEHistogram
     end
     EdgeVector = [-100,0:0.5:8,1000]		;
     [Counts] = histc(BestDE, EdgeVector)	;
-    HistogramData = [EdgeVector; Counts]	;
+    HistogramData = [EdgeVector; reshape(Counts,1,length(Counts))]	;
     stairs(EdgeVector, Counts)				;
     set(gca, 'xlim', [-1,7])				;
     figname = [Name,'HistDEIteration',num2str(iteration)]	;
-    print(gcf, [figname,'.eps'], '-deps');
+    print(gcf, [figname,'.eps'], '-depsc');
     print(gcf, [figname,'.png'], '-dpng');
     print(gcf, [figname,'.jpg'], '-djpg');
     print(gcf, [figname,'.pdf'], '-dpdf');
@@ -605,7 +766,8 @@ while iteration < MaxIterations && AllAimPointsProcessed == false
 	% If samples were already printed and measured, skip this step to save time.
     CSVFile = [Name,'Iteration',num2str(iteration),'.csv']		;
     if isempty(which(CSVFile))
-       	NumberOfPagesPrinted = PrintRGBs(NewRGBsToPrint, [Name,'Iteration',num2str(iteration)])		;
+       	NumberOfPagesPrinted = PrintRGBs(NewRGBsToPrint, [Name,'Iteration',num2str(iteration)], ...
+       									PatchesDown, PatchesAcross)		;
 	end
 			
     % During the pause, print the figure using the printer and paper of interest.
@@ -657,8 +819,7 @@ while iteration < MaxIterations && AllAimPointsProcessed == false
                i1i02txtFileToColorMunkiCSVFormat(NewFileName)	;
             ListOfColorMunkiCSVfiles{end+1} = [NewFileName(1:(end-3)),'csv']	;
         end
-        ConcatenateColorMunkiCSVFiles(ListOfColorMunkiCSVfiles, CSVfileName);
-        
+        ConcatenateColorMunkiCSVFiles(ListOfColorMunkiCSVfiles, CSVfileName);     
     end
 		
     NumberOfNewMeasuredColours = NumberOfNewMeasuredColours + NumberOfNewPrintedSamples	;
@@ -672,7 +833,6 @@ while iteration < MaxIterations && AllAimPointsProcessed == false
     CIEcoords = ReflectancesToCIEwithWhiteY100(Wavelengths, NewReflectances, IllumObs);
 	NewXYZ    = CIEcoords(:,1:3)										;
 	NewxyY    = CIEcoords(:,4:6)										;
-		
 				
     % Count the number of RGB entries in the current shade bank data
     [NumOfOrigRGBs,~] = size(RGB)		;
@@ -734,7 +894,7 @@ while iteration < MaxIterations && AllAimPointsProcessed == false
         stairs(EdgeVector, Counts)						;
         set(gca, 'xlim', [0,50])						;
         figname = [Name,'HistInternalDEIteration',num2str(iteration)]	;
-        print(gcf, [figname,'.eps'], '-deps');
+        print(gcf, [figname,'.eps'], '-depsc');
         print(gcf, [figname,'.png'], '-dpng');
         print(gcf, [figname,'.jpg'], '-djpg');
         print(gcf, [figname,'.pdf'], '-dpdf');
@@ -781,7 +941,7 @@ while iteration < MaxIterations && AllAimPointsProcessed == false
         stairs(EdgeVector, Counts)				;
         set(gca, 'xlim', [-1,7])				;
         figname = [Name,'HistDEIteration',num2str(iteration)]	;
-        print(gcf, [figname,'.eps'], '-deps');
+        print(gcf, [figname,'.eps'], '-depsc');
         print(gcf, [figname,'.png'], '-dpng');
         print(gcf, [figname,'.jpg'], '-djpg');
         print(gcf, [figname,'.pdf'], '-dpdf');
@@ -854,7 +1014,8 @@ while iteration < MaxIterations && AllAimPointsProcessed == false
 	% If samples were already printed and measured, skip this step to save time.
     CSVFile = [Name,'Iteration',num2str(iteration),'.csv']				;
     if isempty(which(CSVFile))
-    	NumberOfPagesPrinted = PrintRGBs(RGBAttempts, [Name,'Iteration',num2str(iteration)])	;
+    	NumberOfPagesPrinted = PrintRGBs(RGBAttempts, [Name,'Iteration',num2str(iteration)], ...
+    										PatchesDown, PatchesAcross)	;
 	end
 	
     % During the pause, print the figure using the printer and paper of interest.
@@ -1002,7 +1163,7 @@ disp(['NumOfOrigRGBs: ', num2str(NumOfOrigRGBs)]);
         stairs(EdgeVector, Counts)				;
         set(gca, 'xlim', [-1,7])				;
         figname = [Name,'HistDEIteration',num2str(iteration)]	;
-        print(gcf, [figname,'.eps'], '-deps');
+        print(gcf, [figname,'.eps'], '-depsc');
         print(gcf, [figname,'.png'], '-dpng');
         print(gcf, [figname,'.jpg'], '-djpg');
         print(gcf, [figname,'.pdf'], '-dpdf');
@@ -1128,7 +1289,7 @@ if DisplayBestDEHistogram
     stairs(EdgeVector, Counts)				;
     set(gca, 'xlim', [-1,11])				;
     figname = [Name,'HistDEIterationFinal']	;
-    print(gcf, [figname,'.eps'], '-deps');
+    print(gcf, [figname,'.eps'], '-depsc');
     print(gcf, [figname,'.png'], '-dpng');
     print(gcf, [figname,'.jpg'], '-djpg');
     print(gcf, [figname,'.pdf'], '-dpdf');
@@ -1156,6 +1317,55 @@ for ind = 1:NumberOfAimPoints
 end
 fclose(fid)								;
 
+
+
+% Again, write the closest RGBs for the aimpoints out to a file, including the DE.  This
+% time, include the sample names, if the user has input any.
+if exist('StandardNames')
+	fid = fopen([Name,'NamesBestRGBList',IllumObsNoSlashes,'.txt'], 'w')	;
+%	fprintf(fid, '%s,\t%s,\t%s,\t%s,\t%s\n', ...
+%				 'Index','R','G','B','DE2000')		;
+	ctr = 0											;
+	for ind = 1:NumberOfAimPoints		
+	   ctr = ctr + 1						;
+	   fprintf(fid,'%d\t%5.4f\t%5.4f\t%5.4f\t%5.4f',...
+		   StandardNames{ctr},...
+		   FinalRGBs(ind,1),...
+		   FinalRGBs(ind,2),...
+		   FinalRGBs(ind,3),...				
+		   MinDEs(ind))			;
+
+	   % To avoid a blank line at the end of the output file, make sure a line return is
+	   % not used in the last line, but is used for every other line.
+	   if ctr ~= NumberOfAimPoints		%NumOfLines
+		   fprintf(fid,'\n')				;
+	   end
+	end
+	fclose(fid)								;
+else	
+	fid = fopen([Name,'BestRGBList',IllumObsNoSlashes,'.txt'], 'w')	;
+	fprintf(fid, '%s,\t%s,\t%s,\t%s,\t%s\n', ...
+				 'Index','R','G','B','DE2000')		;
+	ctr = 0											;
+	for ind = 1:NumberOfAimPoints		
+	   ctr = ctr + 1						;
+	   fprintf(fid,'%d\t%5.4f\t%5.4f\t%5.4f\t%5.4f',...
+		   ctr,...
+		   FinalRGBs(ind,1),...
+		   FinalRGBs(ind,2),...
+		   FinalRGBs(ind,3),...				
+		   MinDEs(ind))			;
+
+	   % To avoid a blank line at the end of the output file, make sure a line return is
+	   % not used in the last line, but is used for every other line.
+	   if ctr ~= NumberOfAimPoints		%NumOfLines
+		   fprintf(fid,'\n')				;
+	   end
+	end
+	fclose(fid)								;
+end
+
+
 % Write out file that gives best DEs, as well as all reflectances
 ReflectanceDataFile = [Name,IllumObsNoSlashes,'RGBreflectances.txt']	;
 fid = fopen(ReflectanceDataFile, 'w')									;
@@ -1169,10 +1379,9 @@ fprintf(fid, '\n')	;
 fclose(fid)			;
 dlmwrite(ReflectanceDataFile, RGBresults, ',', '-append')	;
 
-
 % Print a display of the aimpoints which have been matched.
 disp([' ']);
-disp(['The figure shows the matches for the input aimpoints.  Aimpoints which are'])	;
+disp(['The first figure shows the matches for the input aimpoints.  Aimpoints which are'])	;
 disp(['out of gamut, or could not be matched, are left blank.  ',num2str(AimPointsFound),' colours'])	;
 disp(['are displayed.  The RGBs for the aimpoints appear in the file ',Name,'BestRGBList',IllumObsNoSlashes,'.txt.'])
 disp(['The last column of the file gives the best DE obtained.'])
@@ -1185,4 +1394,33 @@ for ind = 1:APctr
 	    RGBsOfMatches(ind,:) = [1 1 1]						;
 	end
 end	
-PrintRGBs(RGBsOfMatches, [Name,'RGBresults'])						;
+PrintRGBs(RGBsOfMatches, [Name,'RGBresults'], 25, 20)						;
+
+% Print a display of the best matches for each aimpoint, whether or not they meet the
+% input threshold.
+disp([' ']);
+disp(['The second figure shows the best matches for the input aimpoints, even if they do not'])
+disp(['match to within the input threshold.  ',num2str(size(AimPointsxyY,1)),' colours'])	;
+disp(['are displayed.  The RGBs for the aimpoints appear in the file ',Name,'BestRGBList',IllumObsNoSlashes,'.txt.'])
+disp(['The last column of the file gives the best DE obtained.'])
+RGBsOfMatches = []						;
+[AProws,~] = size(AimPointResults)		;
+for ind = 1:APctr
+	RGBsOfMatches(ind,:) = [FinalRGBs(ind,1), FinalRGBs(ind,2), FinalRGBs(ind,3)]	;
+end	
+% PrintRGBs(RGBsOfMatches, [Name,'RGBresultsEvenOutsideThreshold'])			
+if isempty(StandardNames)
+	StandardNames = {}	;
+	for ctr = 1:APctr
+		StandardNames{ctr} = ['Sample ',num2str(ctr)] 	;
+	end
+end	
+PrintRGBmatchesWithDEs(RGBsOfMatches, ...
+					   [Name,'BestRGBsWithDEs'], ...
+					   StandardNames, ...
+					   MinDEs, 3, 3);		
+					   
+% Consolidate the shade bank for further use
+ShadeBankFileName
+%[ShadeBankDirectory,ShortShadeBankName] = fileparts(ShadeBankFile)	
+ConsolidateShadeBankFile(ShadeBankFileName,pwd)					   

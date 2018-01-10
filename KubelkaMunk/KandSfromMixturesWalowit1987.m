@@ -18,8 +18,13 @@ function [K,S] = KandSfromMixturesWalowit1987(Wavelengths,...
 %				when given the reflectance spectra of mixtures of those colorants, at known
 %				concentrations.  The algorithm actually applies to only one wavelength at a
 %				time, so it is applied multiple times, once to each of the entries in Wavelengths.
-%
 %				Many of the variable names in this routine follow the names used in [Walowit1987].
+%
+%				Other routines in the Munsell and Kubelka-Munk Toolbox, such as KandSfromMixtures.m
+%				and KandSfromMixturesCentore2013, use suggested updates to Walowit s 1987
+%				algorithm.  The current routine is included here both for comparison, and because
+%				the updated routines still use it to find an initial estimate of the Ks and Ss
+%				(which they then refine).
 %
 % References	[Walowit1987] Eric Walowit, Cornelius J. McCarthy, & Roy S. Berns, "An Algorithm
 %				for the Optimization of Kubelka-Munk Absorption and Scattering Coefficients,"
@@ -48,11 +53,13 @@ function [K,S] = KandSfromMixturesWalowit1987(Wavelengths,...
 %								wavelength in Wavelengths.  K and S are both column vectors, whose
 %								number of rows is the number of paints
 %
-% Related Routines	KandSfromMixturesCentore2013
+% Related Routines	KandSfromMixturesCentore2013, KandSfromMixtures
 %
 % Author		Paul Centore (July 21, 2013)
+% Revised		Paul Centore (January 4, 2015)
+%				--Replaced ols (ordinary least squares) with lsqnonneg (non-negative least squares)
 %
-% Copyright 2013 Paul Centore
+% Copyright 2013, 2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -106,7 +113,8 @@ for ctr = 1:NumOfWavelengths
 	OBS((NumOfMixtures+1),1) = 1	;
 
 	% Solve a linear least squares system to get estimates for K and S
-	[KandS, sigma, r] = ols (OBS, KSCOEFS)	;
+%	[KandS, sigma, r] = ols (OBS, KSCOEFS)	;	% Previous method, replaced Jan. 4, 2015
+	KandS = lsqnonneg(KSCOEFS, OBS)			;
 	K(:,ctr) = KandS(1:NumOfPaints)			;
 	S(:,ctr) = KandS((NumOfPaints+1):end)	;
 	

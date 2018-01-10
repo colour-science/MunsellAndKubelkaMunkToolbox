@@ -1,0 +1,321 @@
+Description:  
+In 1955, the Inter-Society Color Council (ISCC) and the US National Bureau of Standards 
+(NBS) (now called NIST) produced the ISCC-NBS colour naming system [Kelly1976].  This
+system expresses common verbal colour descriptions, such as "light purplish pink," in 
+terms of the Munsell system [Newhall1943].  Terms such as "light purplish pink" encompass
+a multitude of distinguishable colours.  In fact, any Munsell colour whose hue is between
+9P and 9RP, whose value is greater than 7.5, and whose chroma is between 5 and 9, would
+be considered a light purplish pink.  
+
+The ISCC-NBS system formalizes such relationships.  It gives colour names at three
+increasing levels of precision.  In Level 1, a colour is designated very broadly, using
+one of 13 common names (pink, red, orange, brown, yellow, olive, yellow green, green,
+blue, purple, white, gray, or black).  This description is commonly understood, but only
+approximate: there are many colours, for example, that would be called "red."  In Level 2,
+16 intermediate colour names are added (yellowish pink, reddish orange, reddish brown,
+orange yellow, yellowish brown, olive brown, greenish yellow, yellow green, olive green,
+yellowish green, bluish green, greenish blue, purplish blue, reddish purple, purplish
+pink, and purplish red).  Combining the 16 intermediate terms with the 13 original terms
+from Level 1 gives a total of 29 Level 2 colour names.  Level 3 extends Level 2 by adding 
+modifiers such as light, deep, grayish, vivid, etc.  In all, Level 3 contains 267 colour
+names, and is the most detailed level of the ISCC-NBS system.  
+
+Each Level 3 term is defined as a subset, or "block," of the Munsell system [Kelly1976].  
+In 1958, [Kelly1958] calculated the centroid, in the Munsell system, of the block for each
+Level 3 term.  The current file presents his results in a digital format, for use in
+computer applications.  There are four columns of data.  The first three give the index
+number, the Level 3 category name, and the Munsell centroid.  The fourth column specifies
+whether a block is interior to the Munsell system (i.e. the block nowhere reaches the
+MacAdam limits) or on its periphery (i.e. the block does reach the MacAdam limits
+somewhere).  This distinction is important because different methods were used to calculate
+the centroid in the two cases; see [Kelly1958] for details.  There is less confidence in
+the accuracy of the peripheral centroids.  [Kelly1958] indicates the peripheral cases by
+placing an asterisk after the centroids' Munsell coordinates.
+
+[Kelly1976] Kenneth L. Kelly & Deane B. Judd, "Color: Universal Language and Dictionary 
+		of Names," NBS Special Publication 440, 1976. Available online at
+		http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication440.pdf or
+		https://ia801701.us.archive.org/9/items/coloruniversalla00kell/coloruniversalla00kell.pdf
+[Newhall1943] S. M. Newhall, D. Nickerson, & D. B. Judd, "Final
+        Report of the O.S.A. Subcommittee on the Spacing of the Munsell
+        Colors," Journal of the Optical Society of America, Vol. 33,
+        Issue 7, pp. 385-418, 1943.
+[Kelly1958] Kenneth L. Kelly, "Central Notations for the Revised ISCC-NBS Color-Name 
+		Blocks," Research Paper 2911, Journal of Research of the National Bureau of Standards, 
+		Vol. 61, No. 5, pp. 427-431, November 1958.
+		http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication440.pdf or
+		https://ia801701.us.archive.org/9/items/coloruniversalla00kell/coloruniversalla00kell.pdf
+		
+Author:	Paul Centore (April 27, 2016)
+Copyright 2016 Paul Centore
+This file is released under the GNU General Public License (see http://www.gnu.org/licenses/ )
+
+DESCRIPTION ENDS HERE
+Number	Category	Centroid	Location
+1	Vivid pink	1.5R7/13	Peripheral
+2	Strong pink	1.5R7.5/9.1	Peripheral
+3	Deep pink	1.9R6.0/11.1	Interior
+4	Light pink	2.5R8.6/5.2	Peripheral
+5	Moderate pink	2.5R7.2/5.2	Interior
+6	Dark pink	2.5R6.0/6.0	Interior
+7	Pale pink	2.5R8.8/2.3	Peripheral
+8	Grayish pink	2.5R7.2/2.3	Interior
+9	Pinkish white	7.6R9.2/1.0	Peripheral
+10	Pinkish gray	7.6R7.5/1.0	Interior
+11	Vivid red	5R4/1.5	Peripheral
+12	Strong red	4.0R4.5/12.0	Interior
+13	Deep red	5.0R2.8/9.9	Interior
+14	Very deep red	5.0R1.4/9.0	Peripheral
+15	Moderate red	4.0R4.5/9.1	Interior
+16	Dark red	4.5R2.8/6.8	Interior
+17	Very dark red	3.5R1.2/4.9	Peripheral
+18	Light grayish red	4.9R6.0/3.4	Interior
+19	Grayish red	4.6R4.5/4.7	Interior
+20	Dark grayish red	3.5R2.7/2.2	Interior
+21	Blackish red	3.5R1.1/1.6	Peripheral
+22	Reddish gray	6.5R5.5/1.1	Interior
+23	Dark reddish gray	6.0R3.5/1.1	Interior
+24	Reddish black	6.0R0.9/0.8	Peripheral
+25	Vivid yellowish pink	8.0R7/13	Peripheral
+26	Strong yellowish pink	8.0R7.5/9.0	Peripheral
+27	Deep yellowish pink	5.6R6.0/12.4	Interior
+28	Light yellowish pink	0.7YR8.6/4.8	Peripheral
+29	Moderate yellowish pink	0.7YR7.2/4.8	Interior
+30	Dark yellowish pink	7.0R6.0/6.0	Interior
+31	Pale yellowish pink	2.1YR8.8/2.2	Peripheral
+32	Grayish yellowish pink	0.5YR7.2/2.3	Interior
+33	Brownish pink	6.5YR7.2/2.2	Interior
+34	Vivid reddish orange	9.5R5.5/15.5	Peripheral
+35	Strong reddish orange	9.5R5.5/12.0	Interior
+36	Deep reddish orange	9.5R4.0/12.0	Interior
+37	Moderate reddish orange	9.5R5.5/9.1	Interior
+38	Dark reddish orange	9.5R4.0/9.1	Interior
+39	Grayish reddish orange	0.5YR5.5/6.0	Interior
+40	Strong reddish brown	0.5YR3.0/11.2	Peripheral
+41	Deep reddish brown	9.8R1.5/7.5	Peripheral
+42	Light reddish brown	0.5YR5.5/4.1	Interior
+43	Moderate reddish brown	9.6R3.4/5.2	Interior
+44	Dark reddish brown	9.5R1.3/3.6	Peripheral
+45	Light grayish reddish brown	3.0YR5.5/2.3	Interior
+46	Grayish reddish brown	9.9R3.4/2.3	Interior
+47	Dark grayish reddish brown	9.5R2.0/2.0	Interior
+48	Vivid orange	4.5YR6.6/16	Peripheral
+49	Brilliant orange	4.5YR8.0/12.1	Peripheral
+50	Strong orange	4.5YR6.5/12.1	Interior
+51	Deep orange	4.5YR5.0/12.1	Interior
+52	Light orange	4.5YR8/8.1	Peripheral
+53	Moderate orange	4.6YR6.5/8.1	Interior
+54	Brownish orange	4.5YR5.0/8.2	Interior
+55	Strong brown	5.0YR3.5/8	Peripheral
+56	Deep brown	5.0YR2.1/6	Peripheral
+57	Light brown	5.5YR5.5/4.6	Interior
+58	Moderate brown	5.5YR3.5/3.9	Interior
+59	Dark brown	5.5YR1.6/3.6	Peripheral
+60	Light grayish brown	6.5YR5.5/2.2	Interior
+61	Grayish brown	5.6YR3.5/2.0	Interior
+62	Dark grayish brown	5.5YR2.0/1.7	Interior
+63	Light brownish gray	6.8YR5.5/1.0	Interior
+64	Brownish gray	6.4YR3.5/0.9	Interior
+65	Brownish black	7.5YR0.8/0.8	Peripheral
+66	Vivid orange yellow	9.0YR7.2/16	Peripheral
+67	Brilliant orange yellow	9.0YR8.4/12.1	Peripheral
+68	Strong orange yellow	9.0YR7.2/12.1	Interior
+69	Deep orange yellow	9.0YR6.0/12.1	Interior
+70	Light orange yellow	9.0YR8.6/8.1	Peripheral
+71	Moderate orange yellow	9.0YR7.2/8.1	Interior
+72	Dark orange yellow	9.0YR6.0/8.1	Interior
+73	Pale orange yellow	9.1YR8.6/4.4	Peripheral
+74	Strong yellowish brown	9.0YR4.6/9.6	Peripheral
+75	Deep yellowish brown	9.5YR2.9/6	Peripheral
+76	Light yellowish brown	9.2YR6.6/4.7	Interior
+77	Moderate yellowish brown	9.5YR4.5/4.0	Interior
+78	Dark yellowish brown	9.5YR2.2/3.7	Peripheral
+79	Light grayish yellowish brown	9.5YR6.4/2.4	Interior
+80	Grayish yellowish brown	9.5YR4.6/2.1	Interior
+81	Dark grayish yellowish brown	9.5YR2.4/1.8	Interior
+82	Vivid yellow	4.0Y7.8/14.5	Peripheral
+83	Brilliant yellow	4.0Y8.8/9.5	Peripheral
+84	Strong yellow	4.0Y7.2/9.5	Interior
+85	Deep yellow	4.0Y6.0/9.5	Interior
+86	Light yellow	4.0Y8.8/6.6	Peripheral
+87	Moderate yellow	4.0Y7.2/6.6	Interior
+88	Dark yellow	4.0Y6.0/6.6	Interior
+89	Pale yellow	4.2Y8.9/3.6	Peripheral
+90	Grayish yellow	4.2Y7.2/3.6	Interior
+91	Dark grayish yellow	4.0Y6.0/4.1	Interior
+92	Yellowish white	4.1Y9.2/1.3	Peripheral
+93	Yellowish gray	4.1Y7.5/1.3	Interior
+94	Light olive brown	2.5Y5.0/8.4	Peripheral
+95	Moderate olive brown	2.5Y3.5/6	Peripheral
+96	Dark olive brown	2.5Y1.8/2.5	Peripheral
+97	Vivid greenish yellow	9.5Y7.8/14.5	Peripheral
+98	Brilliant greenish yellow	9.5Y8.8/9.5	Peripheral
+99	Strong greenish yellow	9.5Y7.2/9.5	Interior
+100	Deep greenish yellow	9.5Y6.0/9.5	Interior
+101	Light greenish yellow	9.5Y8.8/6.6	Peripheral
+102	Moderate greenish yellow	9.5Y7.2/6.6	Interior
+103	Dark greenish yellow	9.5Y6.0/6.6	Interior
+104	Pale greenish yellow	9.5Y8.9/4.1	Peripheral
+105	Grayish greenish yellow	9.5Y7.2/4.1	Interior
+106	Light olive	8.1Y5.1/8.0	Peripheral
+107	Moderate olive	8.0Y3.5/5.8	Peripheral
+108	Dark olive	8.0Y1.7/3.2	Peripheral
+109	Light grayish olive	8.3Y5.5/2.4	Interior
+110	Grayish olive	8.1Y3.5/2.3	Interior
+111	Dark grayish olive	8.0Y2.0/2.0	Interior
+112	Light olive gray	7.4Y5.5/1.3	Interior
+113	Olive gray	8.1Y3.5/1.0	Interior
+114	Olive black	9.0Y0.9/0.8	Peripheral
+115	Vivid yellow green	5.0GY7.5/14.5	Peripheral
+116	Brilliant yellow green	5.0GY8.5/9.1	Peripheral
+117	Strong yellow green	5.0GY6.0/9.1	Interior
+118	Deep yellow green	5.0GY4.0/9.1	Interior
+119	Light yellow green	5.0GY8.6/5.2	Peripheral
+120	Moderate yellow green	5.0GY6.0/5.2	Interior
+121	Pale yellow green	3.5GY8.7/2.2	Peripheral
+122	Grayish yellow green	4.4GY6.1/2.2	Interior
+123	Strong olive green	5.0GY3.2/7.8	Peripheral
+124	Deep olive green	5.0GY2.4/7.1	Peripheral
+125	Moderate olive green	5.0GY3.5/5.2	Interior
+126	Dark olive green	5.0GY1.8/3.7	Peripheral
+127	Grayish olive green	5.0GY3.5/2.2	Interior
+128	Dark grayish olive green	5.0GY2.0/2.0	Interior
+129	Vivid yellowish green	0.5G7/15.5	Peripheral
+130	Brilliant yellowish green	0.5G8.0/9.1	Peripheral
+131	Strong yellowish green	0.5G5.5/9.1	Interior
+132	Deep yellowish green	0.5G3.5/11.5	Peripheral
+133	Very deep yellowish green	0.5G2.0/9.2	Peripheral
+134	Very light yellowish green	0.5G9.1/5.1	Peripheral
+135	Light yellowish green	0.5G7.5/5.1	Interior
+136	Moderate yellowish green	0.5G5.5/5.1	Interior
+137	Dark yellowish green	0.5G3.5/5.1	Interior
+138	Very dark yellowish green	0.5G1.5/4.9	Peripheral
+139	Vivid green	6.5G5.2/18	Peripheral
+140	Brilliant green	6.0G7.4/9.1	Peripheral
+141	Strong green	6.0G4.5/9.1	Interior
+142	Deep green	6.0G2.3/9.1	Peripheral
+143	Very light green	6.0G8.6/5.1	Peripheral
+144	Light green	6.0G6.5/5.1	Interior
+145	Moderate green	6.0G4.5/5.1	Interior
+146	Dark green	6.0G2.7/5.0	Interior
+147	Very dark green	6.0G1.3/4.9	Peripheral
+148	Very pale green	9.0G8.7/1.8	Peripheral
+149	Pale green	9.0G6.5/1.8	Interior
+150	Grayish green	9.0G4.5/1.8	Interior
+151	Dark grayish green	9.0G2.8/1.6	Interior
+152	Blackish green	9.0G1.1/1.4	Peripheral
+153	Greenish white	7.0G9.2/0.8	Peripheral
+154	Light greenish gray	7.0G7.5/0.8	Interior
+155	Greenish gray	7.0G5.5/0.8	Interior
+156	Dark greenish gray	7.0G3.5/0.8	Interior
+157	Greenish black	7.5G0.9/0.7	Peripheral
+158	Vivid bluish green	4.5BG5.3/15.5	Peripheral
+159	Brilliant bluish green	4.5BG7.3/9.0	Peripheral
+160	Strong bluish green	4.5BG4.5/9.0	Interior
+161	Deep bluish green	4.5BG2.3/9.0	Peripheral
+162	Very light bluish green	4.5BG8.5/5.0	Peripheral
+163	Light bluish green	4.5BG6.5/5.0	Interior
+164	Moderate bluish green	4.5BG4.5/5.0	Interior
+165	Dark bluish green	4.5BG2.7/5.0	Interior
+166	Very dark bluish green	4.5BG1.3/4.9	Peripheral
+167	Vivid greenish blue	4.5B5.2/13	Peripheral
+168	Brilliant greenish blue	4.5B6.8/9.0	Peripheral
+169	Strong greenish blue	4.5B4.5/9.0	Interior
+170	Deep greenish blue	4.5B2.5/9.0	Peripheral
+171	Very light greenish blue	4.5B8.2/5.2	Peripheral
+172	Light greenish blue	4.5B6.5/5.2	Interior
+173	Moderate greenish blue	4.5B4.5/5.2	Interior
+174	Dark greenish blue	4.5B2.7/5.0	Interior
+175	Very dark greenish blue	4.5B1.3/4.9	Peripheral
+176	Vivid blue	3.0PB4.2/15	Peripheral
+177	Brilliant blue	3.0PB6.4/11.0	Peripheral
+178	Strong blue	3.0PB4.2/11.0	Interior
+179	Deep blue	3.0PB2.0/9.0	Peripheral
+180	Very light blue	2.4PB8.2/7.2	Peripheral
+181	Light blue	2.7PB6.5/7.3	Interior
+182	Moderate blue	2.9PB4.2/7.2	Interior
+183	Dark blue	2.8PB1.7/5.0	Peripheral
+184	Very pale blue	0.9PB8.4/3.0	Peripheral
+185	Pale blue	0.9PB6.5/3.0	Interior
+186	Grayish blue	0.9PB4.2/3.0	Interior
+187	Dark grayish blue	9.5B2.6/1.9	Interior
+188	Blackish blue	9.5B1.1/1.5	Peripheral
+189	Bluish white	9.5B9.1/1.0	Peripheral
+190	Light bluish gray	9.5B7.5/1.0	Interior
+191	Bluish gray	9.5B5.5/1.0	Interior
+192	Dark bluish gray	9.5B3.5/1.0	Interior
+193	Bluish black	9.5B1.0/0.7	Peripheral
+194	Vivid purplish blue	8.0PB2.5/22	Peripheral
+195	Brilliant purplish blue	8.0PB6.0/10.8	Peripheral
+196	Strong purplish blue	8.0PB4.1/11.4	Interior
+197	Deep purplish blue	8.0PB1.6/9.1	Peripheral
+198	Very light purplish blue	7PB7.8/6.1	Peripheral
+199	Light purplish blue	7.5PB6.0/6.8	Interior
+200	Moderate purplish blue	8.0PB3.5/6.9	Interior
+201	Dark purplish blue	7.9PB1.1/4.7	Peripheral
+202	Very pale purplish blue	7.0PB8.2/4.1	Peripheral
+203	Pale purplish blue	7.0PB6.0/4.1	Interior
+204	Grayish purplish blue	7.2PB3.3/4.0	Interior
+205	Vivid violet	1.0P2.7/21	Peripheral
+206	Brilliant violet	1.0P5.9/11.1	Peripheral
+207	Strong violet	1.0P3.5/11.1	Interior
+208	Deep violet	1.0P1.4/10.3	Peripheral
+209	Very light violet	1.0P7.9/7	Peripheral
+210	Light violet	1.0P6.0/7.2	Interior
+211	Moderate violet	1.0P3.5/7.2	Interior
+212	Dark violet	1.0P1.3/5.0	Peripheral
+213	Very pale violet	1.0P8.2/4.1	Peripheral
+214	Pale violet	1.0P6.0/4.1	Interior
+215	Grayish violet	1.0P3.3/4.1	Interior
+216	Vivid purple	6.0P3.5/20	Peripheral
+217	Brilliant purple	6.0P6.7/11.1	Peripheral
+218	Strong purple	6.0P4.5/11.1	Interior
+219	Deep purple	6.0P2.8/10.2	Interior
+220	Very deep purple	6.0P1.2/10.2	Peripheral
+221	Very light purple	6.0P8.0/7.2	Peripheral
+222	Light purple	6.0P6.5/7.2	Interior
+223	Moderate purple	6.0P4.5/7.2	Interior
+224	Dark purple	6.0P2.7/5.1	Interior
+225	Very dark purple	6.0P1.1/4.9	Peripheral
+226	Very pale purple	5.4P8.4/3.3	Peripheral
+227	Pale purple	6.8P6.4/3.0	Interior
+228	Grayish purple	7.8P4.5/2.9	Interior
+229	Dark grayish purple	10.0P2.8/2.0	Interior
+230	Blackish purple	10.0P1.0/1.4	Peripheral
+231	Purplish white	9.0P9.1/1.0	Peripheral
+232	Light purplish gray	9.0P7.5/1.0	Interior
+233	Purplish gray	10.0P5.5/1.0	Interior
+234	Dark purplish gray	10.0P3.5/1.0	Interior
+235	Purplish black	10.0P1.0/0.7	Peripheral
+236	Vivid reddish purple	1.0RP4/19	Peripheral
+237	Strong reddish purple	1.0RP4.5/11.1	Interior
+238	Deep reddish purple	1.0RP2.8/10.3	Interior
+239	Very deep reddish purple	1.0RP1.3/10.3	Peripheral
+240	Light reddish purple	1.0RP6.0/7.2	Interior
+241	Moderate reddish purple	1.0RP4.5/7.2	Interior
+242	Dark reddish purple	1.0RP2.7/5.1	Interior
+243	Very dark reddish purple	1.0RP1.1/5.0	Peripheral
+244	Pale reddish purple	1.0RP6.0/4.1	Interior
+245	Grayish reddish purple	1.0RP4.5/4.1	Interior
+246	Brilliant purplish pink	4.0RP7.9/11	Peripheral
+247	Strong purplish pink	4.0RP7/14.5	Peripheral
+248	Deep purplish pink	4.0RP6.0/12.0	Interior
+249	Light purplish pink	4.0RP8.3/7.1	Peripheral
+250	Moderate purplish pink	4.0RP7.0/7.1	Interior
+251	Dark purplish pink	6.0RP6.0/7.2	Interior
+252	Pale purplish pink	4.0RP8.5/3.5	Peripheral
+253	Grayish purplish pink	4.0RP7.0/3.5	Interior
+254	Vivid purplish red	7.0RP4/17	Peripheral
+255	Strong purplish red	7.0RP4.5/11.9	Interior
+256	Deep purplish red	7.0RP2.8/11.0	Interior
+257	Very deep purplish red	7.0RP1.3/9.0	Peripheral
+258	Moderate purplish red	7.0RP4.5/9.0	Interior
+259	Dark purplish red	7.0RP2.7/6.3	Interior
+260	Very dark purplish red	7.0RP1.2/4.9	Peripheral
+261	Light grayish purplish red	7.0RP6.0/4.0	Interior
+262	Grayish purplish red	7.0RP4.5/5.2	Interior
+263	White	3.0Y9.25/0.06	Interior
+264	Light gray	3.0Y7.5/0.06	Interior
+265	Medium gray	3.0Y5.5/0.06	Interior
+266	Dark gray	N3.5	Interior
+267	Black	N1.25	Interior

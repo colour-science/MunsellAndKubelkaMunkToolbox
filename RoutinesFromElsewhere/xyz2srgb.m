@@ -28,7 +28,7 @@ RGB = (M*XYZ')';
 % The out-of-gamut flag is a column vector of Boolean true/false values.  Each
 % entry corresponds to one row of the input matrix XYZ.
 [NumberOfInputs,~] = size(RGB)					;
-OutOfGamutFlag     = -99 * ones(NumberOfInputs,1)		
+OutOfGamutFlag     = -99 * ones(NumberOfInputs,1)		;
 for index = 1:NumberOfInputs
 	if RGB(index,1) < 0 || RGB(index,1) > 1 ||...
 	   RGB(index,2) < 0 || RGB(index,2) > 1 ||...

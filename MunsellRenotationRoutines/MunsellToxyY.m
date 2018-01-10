@@ -131,8 +131,13 @@ function [x y Y Status] = MunsellToxyY(MunsellSpec);
 %				 ---Corrected handling of failure message from MunsellToxyForIntegerMunsellValue.
 % Revision		Paul Centore (April 26, 2014)  
 %				 ---Added a check that the numerical hue prefix is between 0 and 10.
+% Revision		Paul Centore (August 29, 2014)  
+%				 ---The numerical hue prefix is now only checked when the input colour is not
+%				    a neutral grey (bug pointed out by Thomas Mansencal).
+% Revision		Paul Centore (Feb. 6, 2017)  
+%				 ---Replaced some conditional operators | with ||, to avoid short-circuit warnings
 %
-% Copyright 2010-2013 Paul Centore
+% Copyright 2010-2017 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -160,6 +165,10 @@ y          = -99;
 Y          = -99;
 Status.ind = -99;
 
+% Assign a difference threshold for Munsell value.  If the value is within this much of
+% an integer, it will be rounded to that integer.
+ValueDifferenceThreshold = 0.001	;	
+
 % The input could be either a Munsell string, such as 4.2R8.1/5.3,
 % or a Munsell vector in ColorLab format.  Determine which, and convert
 % to ColorLab format, if needed.
@@ -186,7 +195,7 @@ Y                = LuminanceFactors.ASTMD153508			;
 
 % Check that the Munsell value is between 1 and 10, which are the limits of the
 % renotation data.
-if Value < 1 | Value > 10
+if Value < 1 || Value > 10
    Status.ind = 3;		% Set error and return
    return
 end
@@ -194,18 +203,19 @@ end
 % Additional error check added by Paul Centore on April 26, 2014
 % Check that the Munsell hue prefix is between 0 and 10, which are the limits of the
 % Munsell system.
-if exist('HueNumber')
-    if HueNumber < 0 | HueNumber > 10
-       Status.ind = 3;		% Set error and return
-       return
-    end
+if exist('HueNumber') % This variable was not set for greys, so do not check it (line
+					  % added by Paul Centore on August 29, 2014)
+	if HueNumber < 0 || HueNumber > 10
+	   Status.ind = 3;		% Set error and return
+	   return
+	end
 end
 
 % Bound Munsell value between two integer values, ValueMinus and ValuePlus, for which Munsell
 % renotation data are available.  
 % If the input value is very close to an integer, then assume it is an integer,
 % and let the bounding values both be that integer
-if abs(Value - round(Value)) < 0.001
+if abs(Value - round(Value)) < ValueDifferenceThreshold
    ValueMinus = round(Value)		;
    ValuePlus  = round(Value)		;
 else

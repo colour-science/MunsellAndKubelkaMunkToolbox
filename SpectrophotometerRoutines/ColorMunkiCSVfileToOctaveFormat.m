@@ -6,7 +6,7 @@ function [Wavelengths, Reflectances] = ColorMunkiCSVfileToOctaveFormat(ColorMunk
 %				data for a set of colour samples can be exported to a comma-separated (.csv) file,
 %				by using the File/Export command and choosing the option 'Comma Separated.'  This
 %				routine converts the information in such a CSV file into Octave/Matlab format.  The
-%				Octave/Matlab format consists of a vector of wavelengths, and another vector of the
+%				Octave/Matlab format consists of a vector of wavelengths, and a set of vectors of the
 %				same length, each entry of which is the reflectance percentage for the corresponding
 %				wavelength.
 %
@@ -25,8 +25,10 @@ function [Wavelengths, Reflectances] = ColorMunkiCSVfileToOctaveFormat(ColorMunk
 % Author		Paul Centore (May 19, 2012)
 % Revision		Paul Centore (August 31, 2013)  
 %				 ---Moved from MunsellToolbox program to MunsellAndKubelkaMunkToolbox.
+% Revision		Paul Centore (March 14, 2015)  
+%				 ---Minor documentation change.
 %
-% Copyright 2012 Paul Centore
+% Copyright 2012-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %

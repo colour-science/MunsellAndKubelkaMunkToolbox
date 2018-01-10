@@ -1,4 +1,4 @@
-function EvaluateAttemptedMatches(AimPointsXYZ, SamplesInXYZ, Name, AimPointsInMunsell);
+function DE2000Differences = EvaluateAttemptedMatches(AimPointsXYZ, SamplesInXYZ, Name, AimPointsInMunsell);
 % Purpose		To produce graphs and statistics about how well a set of samples
 %				matches a set of aimpoints.
 %
@@ -42,8 +42,8 @@ function EvaluateAttemptedMatches(AimPointsXYZ, SamplesInXYZ, Name, AimPointsInM
 %				AimPointsInMunsell	An optional list of the aimpoints, in Munsell specifications instead of
 %									XYZ format.  This will save time in conversions.
 %
-% Related		
-% Functions
+%				DE2000Differences	A vector of the DE00 differences between the sample colours
+%									and their aim points
 %
 % Required		CIEDE2000ForXYZ, xyYtoMunsell, MunsellHueToASTMHue
 % Functions		
@@ -54,8 +54,10 @@ function EvaluateAttemptedMatches(AimPointsXYZ, SamplesInXYZ, Name, AimPointsInM
 % Revised		Paul Centore (January 1, 2014)
 %				---Calculated white point for Illuminant C and 2 deg observer, and passed to revised
 %				   routine for calculating CIE DE 2000
+% Revised		Paul Centore (May 30, 2016)
+%				---Made colour differences into output argument
 %
-% Copyright 2012, 2014 Paul Centore
+% Copyright 2012, 2014, 2016 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -101,14 +103,14 @@ disp(['Average, median, min, and max DE: ',...
        num2str(AverageDE),', ',num2str(MedianDE),', ',...
 	   num2str(min(DE2000Differences)),', ',num2str(max(DE2000Differences))])	;
 stairs(DEedgeVector, DECounts, 'k')							;
-set(gca, 'xlim', [0,12], 'ylim', [0,200])							;
+set(gca, 'xlim', [0,3], 'ylim', [0,80])	;	%set(gca, 'xlim', [0,12], 'ylim', [0,200])
 set(gcf, 'Name', ['DEsBetweenAimpointsAndAttemptedMatches',Name])
 figname = ['DEsBetweenAimpointsAndAttemptedMatches',Name]	;
 print(gcf, [figname,'.eps'], '-deps');
 print(gcf, [figname,'.png'], '-dpng');
 print(gcf, [figname,'.jpg'], '-djpg');
 print(gcf, [figname,'.pdf'], '-dpdf');
-return
+return		% This statement can be removed if a detailed Munsell analysis is needed
 
 % Convert XYZ aimpoints to Munsell and ColorLab coordinates, unless this has already been done
 FileName = ['MunsellAimPointsInColorLab',Name,'.mat']		;

@@ -36,8 +36,10 @@ function varargout=roo2xyz(varargin)
 % Part of the OptProp toolbox, $Version: 2.1 $
 % Author:  Jerker Wågberg, More Research & DPC, Sweden
 % Email: ['jerker.wagberg' char(64) 'more.se']
+% Revision: (Paul Centore, Feb. 6, 2017) Commented out call to error() because later 
+%	versions of Octave clutter the screen with too many warnings
 
 % $Id: roo2xyz.m 23 2007-01-28 22:55:34Z jerkerw $
 
 	[err,varargout{1:max(1,nargout)}]=optproc([1 0 2 2],[1 5],@i_roo2xyz,varargin{:});
-	error(err);
+%	error(err);

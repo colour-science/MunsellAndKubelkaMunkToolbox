@@ -3,7 +3,7 @@ function [K,S] = KandSfromMixturesCentore2013(Wavelengths,...
 											  Concentrations);
 % Purpose		Given the reflectance spectra of various mixtures of paints, at different
 %				concentrations, use [Centore2013] to estimate the Kubelka-Munk coefficients,
-%				K and S, for the two paints.
+%				K and S, for the paints.
 %
 % Description	This routine is intended to find the Kubelka-Munk coefficients for a set of
 %				constituent paints or colorants.  The constituent paints have been mixed in
@@ -24,6 +24,13 @@ function [K,S] = KandSfromMixturesCentore2013(Wavelengths,...
 %				time, so it is applied multiple times, once to each of the entries in Wavelengths.
 %
 %				Many of the variable names in this routine follow the names used in [Walowit1987].
+%
+%				This routine has been largely superseded by KandSfromMixtures.m, into which 
+%				it is incorporated.  The routine KandSfromMixtures.m uses the same weights as
+%				this routine, but uses a GJK-based algorithm to solve the least squares problem,
+%				rather than standard least squares methods.  It is likely that the current
+%				routine will be eliminated from future versions of the Munsell and Kubelka-Munk
+%				Toolbox, for simplicity.
 %
 % References	[Centore2013] Paul Centore, "Perceptual Reflectance Weighting for
 %				Kubelka-Munk Estimation," available at wwww.99main.com/~centore, 2013
@@ -51,8 +58,9 @@ function [K,S] = KandSfromMixturesCentore2013(Wavelengths,...
 %
 %				K,S				Kubelka-Munk absorption and scattering coefficients for the paints in
 %								the mixtures.  There is a different coefficient for each
-%								wavelength in Wavelengths.  K and S are both column vectors, whose
-%								number of rows is the number of paints
+%								wavelength in Wavelengths.  K and S are both matrices, whose
+%								number of rows is the number of paints, and whose number of columns is
+%								the number of wavelengths
 %
 % Related Routines	KandSfromMixturesWalowit1987
 %
@@ -62,8 +70,13 @@ function [K,S] = KandSfromMixturesCentore2013(Wavelengths,...
 %				  linear relationship
 %				--When making sure K and S are all less than or equal to 1, the ratios between the Ks and Ss were
 %				  kept constant when any adjustments were made
+% Revised		Paul Centore (December 31, 2014)
+%				--Slight revisions to documentation
+% Revised		Paul Centore (January 4, 2015)
+%				--Checked directly that no sigmas were 0
+%				--Replaced ols (ordinary least squares) with lsqnonneg (non-negative least squares)
 %
-% Copyright 2013 Paul Centore
+% Copyright 2013-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -95,7 +108,7 @@ S = -99*ones(NumOfPaints,NumOfWavelengths)	;
 % coefficients are taken from the algorithm in [Walowit1987].
 [ApproxConstK,ApproxConstS] = KandSfromMixturesWalowit1987(Wavelengths,...
 														   Reflectances,...
-											               Concentrations);
+											               Concentrations)	;
 													 
 % Estimate a K and an S for each paint, at each wavelength.  Loop over wavelengths.
 Sigmas = []			;	% Matrix of standard deviations for different mixtures and wavelengths
@@ -122,6 +135,20 @@ for ctr = 1:NumOfWavelengths
 
 		Sigmas(idx,ctr) = abs(FirstTerms(idx,ctr) * SecondTerms(idx,ctr) * ThirdTerms(idx,ctr))	;
     end
+    
+    % The following check was added because a case occurred where one of the sigmas was 0.  (That
+    % case occurred because EstimatedS was 0, and ultimately because ApproxConstS, as evaluated
+    % by Walowit s 1987 algorithm was 0 whenever concentration was non-zero.  A closer look might
+    % reveal a more elegant way to handle this problem.)
+    maxSigmas  = max(max(Sigmas))	;
+    [row, col] = size(Sigmas)		;
+    for rowctr = 1:row
+		for colctr = 1:col
+			if Sigmas(rowctr,colctr) == 0
+				Sigmas(rowctr,colctr) = 1e6 * maxSigmas	;
+			end
+		end
+    end
 
 	% Construct the matrix KSCOEFS
 	KoverS_mix  = KoverSfromMasstoneR(Reflectances(:,ctr))		;
@@ -133,6 +160,7 @@ for ctr = 1:NumOfWavelengths
 		for id3 = 1:NumOfPaints
 			KSCOEFS(idx, (NumOfPaints + id3)) = KoverS_mix(idx) * Concentrations(idx, id3)		;
 		end
+
         % To weight the residuals properly, divide each row in KSCOEFS (except the last)
 		% by its standard deviation, sigma.  This adjustment is where [Centore2013] differs from
 		% [Walowit1987].	
@@ -153,11 +181,8 @@ for ctr = 1:NumOfWavelengths
 	OBS((NumOfMixtures+1),1) = 1/(10*MaxSigma)	;
 
 	% Solve a linear least squares system to get estimates for K and S
-%	Sigmas(:,ctr)
-%	[FirstTerms(:,ctr), SecondTerms(:,ctr), ThirdTerms(:,ctr)]
-%	KSCOEFS
-%	OBS
-	[KandS, sigma, r] = ols (OBS, KSCOEFS)	;
+%	[KandS, sigma, r] = ols (OBS, KSCOEFS)	;	% Previous method, replaced Jan. 4, 2015
+	KandS = lsqnonneg(KSCOEFS, OBS)			;	% New method, installed Jan. 4, 2015
 	K(:,ctr) = KandS(1:NumOfPaints)			;
 	S(:,ctr) = KandS((NumOfPaints+1):end)	;
 	

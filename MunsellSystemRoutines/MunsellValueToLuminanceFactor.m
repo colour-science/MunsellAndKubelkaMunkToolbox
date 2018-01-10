@@ -50,15 +50,17 @@ function LuminanceFactors = MunsellValueToLuminanceFactor(MunsellValue);
 %
 % Author		Paul Centore (May 15, 2010)
 % Revised by	Paul Centore (December 18, 2010)
-%	Revisions:  Changed name from MunsellValueToReflectionPercentage to MunsellValueToLuminanceFactor
-%				Changed output format from vector to data structure, for easy extensibility
-%				Added ASTM D 1535-08 conversion expression
+%				Changed name from MunsellValueToReflectionPercentage to MunsellValueToLuminanceFactor.
+%				Changed output format from vector to data structure, for easy extensibility.
+%				Added ASTM D 1535-08 conversion expression.
 % Revision		Paul Centore (December 26, 2012)  
 %				 ---Moved from MunsellConversions program to MunsellToolbox.
 % Revision		Paul Centore (August 31, 2013)  
 %				 ---Moved from MunsellToolbox program to MunsellAndKubelkaMunkToolbox.
+% Revision		Paul Centore (July 26, 2015)  
+%				 ---Corrected computation for CIE L*.
 %
-% Copyright 2010, 2012 Paul Centore
+% Copyright 2010-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -83,17 +85,6 @@ Term4 = -0.021009  * (MunsellValue^4)			;
 Term5 =  0.0008404 * (MunsellValue^5)			;
 NewhallLuminanceFactor = Term1 + Term2 + Term3 + Term4 + Term5	;
 
-% Calculate luminance factor in terms of CIELAB model as given in ([Fairchild2005, Sect. 10.3]).
-Lstar = 10 * MunsellValue		;
-fy    = (Lstar + 16)/116		;
-delta = 6/29					;
-if fy > delta
-   CIELABLuminanceFactor = fy^3	;
-else
-   CIELABLuminanceFactor = 3*(fy - (16/116))*(delta^2)	;
-end
-CIELABLuminanceFactor = 100 * CIELABLuminanceFactor	;
-
 % Calculate luminance factor from expression in ([ASTMD1535-08, p. 4]).  This
 % luminance factor is just 0.975 times the luminance factor in [Newhall1943].
 Term1 =  1.1914    * MunsellValue				;
@@ -103,8 +94,17 @@ Term4 = -0.020484  * (MunsellValue^4)			;
 Term5 =  0.00081939 * (MunsellValue^5)			;
 ASTMLuminanceFactor = Term1 + Term2 + Term3 + Term4 + Term5	;
 
+% Calculate luminance factor in terms of CIELAB model as given in ([Fairchild2005, Eq. (10.1) - (10.4)]).
+YoverYn = ASTMLuminanceFactor/100	;
+if YoverYn > 0.008856
+	fOfYoverYn = YoverYn^(1/3)				;
+else
+	fOfYoverYn = 7.787*YoverYn + (16/116)	;
+end	
+CIELABLuminanceFactor = 116*fOfYoverYn -16	;
+
 LuminanceFactors.OriginalMunsellValue = MunsellValue			;
 LuminanceFactors.Newhall1943          = NewhallLuminanceFactor	;
-LuminanceFactors.CIELAB               = CIELABLuminanceFactor	;
 LuminanceFactors.ASTMD153508          = ASTMLuminanceFactor		;
+LuminanceFactors.CIELstar             = CIELABLuminanceFactor	;
 return

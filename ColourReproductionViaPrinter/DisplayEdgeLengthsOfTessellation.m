@@ -88,7 +88,7 @@ end
 % The matrix EdgeVerticesAndLengths has three columns.  The first two entries of each
 % row are the vertex indices for one (unique) edge, and the third entry is the DE for
 % that edge.
-EdgeVerticesAndLengths = [EdgeMatrix, transpose(EdgeLength)] 			;
+EdgeVerticesAndLengths = [EdgeMatrix, transpose(EdgeLengths)] 			;
 % Sort the edges from smallest to largest
 SortedEdgeVerticesAndLengths = sortrows(EdgeVerticesAndLengths, 3) 		;
 % Added Jan. 21, 2014, by Paul Centore---End

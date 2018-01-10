@@ -139,5 +139,7 @@ for Value = 1:9
 end
 
 set(gca, 'xlim', [0 22], 'ylim', [0 10]);
+
+
 print(gcf, [figuretitle,'.png'], '-dpng');
 return; 

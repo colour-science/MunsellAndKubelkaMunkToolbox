@@ -20,8 +20,10 @@ function [EntriesGreaterThan1, ...
 %				sequentially, but does not assume that they form a grid.
 %
 % Author		Paul Centore (December 7, 2013)
+% Revision		Paul Centore (July 6, 2015)
+%				---Added comment that this routine can only handle i1iO AST files with 26 or fewer columns
 %
-% Copyright 2013 Paul Centore
+% Copyright 2013-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -65,7 +67,8 @@ end
 % The next section of code rearranges the order so that the cells are listed as A1, B1,
 % C1,..., then A2, B2, C2, etc.  The rearranged measurements then give reflectance data
 % for samples across the first row of the grid, in order of occurence, then across the
-% second row of the grid, and so on.  
+% second row of the grid, and so on.  Currently, this routine can only handle i1iO files
+% with 26 or fewer columns of data (additional columns are denoted 2A, 2B, 2C, etc.).  
 % Each line of reflectance data is read into a list called AllFileLines.  The letter
 % in the cell indicator is extracted from each lne, as is the number of the cell
 % indicator.  Those are then rearranged so that all the cells with number 1 are listed

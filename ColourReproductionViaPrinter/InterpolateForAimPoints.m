@@ -1,5 +1,5 @@
 function [InterpolatedRGB, RGBvertices, xyzvertices, AllBaryCoords, tessellation] = ...
-		  InterpolateForAimPoints(RGB, xyY, AimPoints);
+		  InterpolateForAimPoints(RGB, xyY, AimPoints, tessellation);
 % Purpose		This routine interpolates over a tetrahedral tessellation, that has been transferred
 %				from an RGB domain, to a codomain in CIE (or other) coordinates.
 %
@@ -48,11 +48,14 @@ function [InterpolatedRGB, RGBvertices, xyzvertices, AllBaryCoords, tessellation
 %				AllBaryCoords		A structure with the barycentric coordinates of the interpolated aimpoints
 %
 %				tessellation		A four-column matrix giving a tetrahedral Delaunay tessellation of
-%									the input RGB data
+%									the input RGB data.  This variable can be input if desired; if not input,
+%									it will be calculated and returned
 %
-%% Author		Paul Centore (June 15, 2012)
+% Author		Paul Centore (June 15, 2012)
+% Revision		Paul Centore (November 3, 2015)
+%				---Made 'tessellation' into an optional input, to avoid recalculating.
 %
-% Copyright 2012 Paul Centore
+% Copyright 2012-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -71,7 +74,9 @@ function [InterpolatedRGB, RGBvertices, xyzvertices, AllBaryCoords, tessellation
 
 % The input RGB values are a discrete set of points in three-dimensional 
 % space.  Tesselate their convex hull.
-tessellation = delaunayn(RGB)				;
+if ~exist('tessellation')
+	tessellation = delaunayn(RGB)	;
+end
 
 % Initialize variables
 InterpolatedRGB = [];
@@ -92,12 +97,12 @@ for ctr = 1:NumberOfAimPoints
 % This routine can take a long time to execute.  To monitor its progress, set
 % the condition in the following if statement to true
 DisplayProgress = true			;
-if mod(ctr,10) == 0 && DisplayProgress
+if mod(ctr,1) == 0 && DisplayProgress
    ElapsedTime = toc()			;
    RemainingMinutes = (ElapsedTime/ctr) * (NumberOfAimPoints-ctr+1)/60	;
    disp([num2str(ElapsedTime), ' sec; ',num2str(ctr),' out of ', num2str(NumberOfAimPoints),...
          '; minutes remaining: ', num2str(RemainingMinutes)])	;
-   fflush(stdout)												;
+   fflush(stdout)	;											;
 end
 
 	% Find which CIE tetrahedron contains a given aimpoint, and what its barycentric

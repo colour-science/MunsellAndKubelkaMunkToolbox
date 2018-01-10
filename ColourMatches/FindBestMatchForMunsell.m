@@ -123,13 +123,13 @@ else		% Reflectance spectrum is not identically 100 percent
     end
 end
 
-% MunsellSpecsColorlab is a 4-column matrix, with one row for each reflectance spectrum.  The
+% MunsellSpecsColorlab is a row vector.  The
 % row entries are the Munsell specification in ColorLab format.  If the colour is not neutral,
 % the ColorLab format has 4 entries.  If the colour is neutral, the ColorLab format has only
 % 1 entry.  In order to make one matrix, with 4 entries in each row, convert the 1-element
 % neutral format into a 4-element format.
 if length(MunsellVec) == 1		
-    BestMunsSpecColorLab(ind,:) = [0 MunsellVec 0 7]	;
+    BestMunsSpecColorLab = [0 MunsellVec 0 7]	;
 else
-    BestMunsSpecColorLab(ind,:) = [MunsellVec]			;
+    BestMunsSpecColorLab = MunsellVec			;
 end

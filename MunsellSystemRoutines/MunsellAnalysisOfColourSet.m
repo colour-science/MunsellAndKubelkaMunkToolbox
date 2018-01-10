@@ -45,8 +45,15 @@ function MunsellAnalysisOfColourSet(MunsellList, NameForOutput, NameList);
 %							though they may be numbers.
 %
 % Author		Paul Centore (February 5, 2014)
+% Revised		Paul Centore (January 5, 2015)
+%				---Changed -deps to -depsc to preserve colours in saved figures
+% Revised		Paul Centore (March 28, 2015)
+%				---Saved some variables in text files for easier reference
+% Revised		Paul Centore (December 12, 2015)
+%				---Made value file printable when no NameList is input
+%				---Made checking for duplicates an option, rather than just doing it
 %
-% Copyright 2014 Paul Centore
+% Copyright 2014-2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -63,11 +70,12 @@ function MunsellAnalysisOfColourSet(MunsellList, NameForOutput, NameList);
 %    You should have received a copy of the GNU General Public License
 %    along with MunsellAndKubelkaMunkToolbox.  If not, see <http://www.gnu.org/licenses/>.
 
-% Use the following flags to set which plots to display
+% Use the following flags to set which plots to display, and whether to look for duplicates
 DisplayHueHistogram   = true	;
 DisplayValueHistogram = true	;
 DisplayChromaHistogram = true	;
-DisplayMunsellHueLeaves = true	;
+DisplayMunsellHueLeaves = false	;
+CheckForNearDuplicates = false	;
 
 NumOfColours = length(MunsellList)	;
 ASTMHuesInList       = -99 * ones(1,NumOfColours) 	;
@@ -178,8 +186,9 @@ if DisplayHueHistogram
 	      RGB,...
 	      'EdgeColor', RGB);
 	hold on
-	set(gca, 'xlim', [0 100])						;
-	set(gca, 'ylim', [LowerY 40])						;
+	set(gca, 'xlim', [0 100])					;
+	UpperY = 1000 * ceil(max(HueCounts)/1000)	;
+	set(gca, 'ylim', [LowerY UpperY])			;
 
 	% Make list of labels for horizontal axis of histogram
 	xTicks = EdgeVector(1:2:end)	;
@@ -196,14 +205,14 @@ if DisplayHueHistogram
 			 'fontname', FontName, ...
 			 'fontweight', LabelFontWeight,...
 			 'fontsize', LabelFontSizeInPoints)
-    ylabel('Number of Pastels',...
+    ylabel('Number of Samples',...
 			 'fontname', FontName, ...
 			 'fontweight', LabelFontWeight,...
 			 'fontsize', LabelFontSizeInPoints)
 
 	figname = [NameForOutput,'HueHistogram']	;
 	set(gcf, 'Name', figname)
-	print(gcf, [figname,'.eps'], '-deps')		;
+	print(gcf, [figname,'.eps'], '-depsc')		;
 	print(gcf, [figname,'.png'], '-dpng')		;
 	print(gcf, [figname,'.jpg'], '-djpg')		;
 	print(gcf, [figname,'.pdf'], '-dpdf')		;
@@ -217,7 +226,7 @@ if DisplayValueHistogram
 	figure
 	stairs(EdgeVector, ValueCounts, 'k')					;
 	set(gca, 'xlim', [0 10])								;
-	set(gca, 'ylim', [0 40])								;
+%	set(gca, 'ylim', [0 40])								;
 	set(gca, 'xtick', 1:10)
 
    	FontName = 'Times New Roman'		;
@@ -227,14 +236,14 @@ if DisplayValueHistogram
 			 'fontname', FontName, ...
 			 'fontweight', LabelFontWeight,...
 			 'fontsize', LabelFontSizeInPoints)
-    ylabel('Number of Pastels',...
+    ylabel('Number of Samples',...
 			 'fontname', FontName, ...
 			 'fontweight', LabelFontWeight,...
 			 'fontsize', LabelFontSizeInPoints)
 
 	figname = [NameForOutput,'ValueHistogram']	;
 	set(gcf, 'Name', figname)
-	print(gcf, [figname,'.eps'], '-deps')		;
+	print(gcf, [figname,'.eps'], '-depsc')		;
 	print(gcf, [figname,'.png'], '-dpng')		;
 	print(gcf, [figname,'.jpg'], '-djpg')		;
 	print(gcf, [figname,'.pdf'], '-dpdf')		;
@@ -266,6 +275,29 @@ for ctr = 1:ColoursToDisplay
 	end
 end
 
+% Save the sorted values of the samples in a text file, for easy reference
+ValueFileName   = [NameForOutput,'SortedValues.txt']	;
+NumberOfSamples = size(SortedValues,1)					;
+Valuefid        = fopen(ValueFileName, 'w')				;
+for ctr = 1:NumberOfSamples
+    if exist('NameList')
+		OutputLine = sprintf('%s\t%s\t%4.2f', ...
+							NameList{SortedIndices(ctr)}, ...
+							MunsellList{SortedIndices(ctr)}, ...
+							SortedValues(ctr))	;
+	else
+		OutputLine = sprintf('%s\t%4.2f', ...
+							MunsellList{SortedIndices(ctr)}, ...
+							SortedValues(ctr))	;
+	end
+	if ctr ~= NumberOfSamples	% Add a return character after each line except the last
+		fprintf(Valuefid, '%s\n', OutputLine)	;
+	else						% No return after last line, to avoid blank line at end of file
+		fprintf(Valuefid, '%s', OutputLine)	;
+	end							
+end
+fclose(Valuefid)	;
+
 
 if DisplayChromaHistogram
 	% Make another histogram, showing how many colours in the set are in different value bands
@@ -274,8 +306,8 @@ if DisplayChromaHistogram
 	ChromaCounts = histc(MunsellChromasInList, EdgeVector)	;
 	figure
 	stairs(EdgeVector, ChromaCounts, 'k')					;
-	set(gca, 'xlim', [0 20])								;
-	set(gca, 'ylim', [0 40])								;
+	set(gca, 'xlim', [0 22])								;
+%	set(gca, 'ylim', [0 60])								;
 	set(gca, 'xtick', 0:2:20)
 
    	FontName = 'Times New Roman'		;
@@ -285,14 +317,14 @@ if DisplayChromaHistogram
 			 'fontname', FontName, ...
 			 'fontweight', LabelFontWeight,...
 			 'fontsize', LabelFontSizeInPoints)
-    ylabel('Number of Pastels',...
+    ylabel('Number of Samples',...
 			 'fontname', FontName, ...
 			 'fontweight', LabelFontWeight,...
 			 'fontsize', LabelFontSizeInPoints)
 
 	figname = [NameForOutput,'ChromaHistogram']	;
 	set(gcf, 'Name', figname)
-	print(gcf, [figname,'.eps'], '-deps')		;
+	print(gcf, [figname,'.eps'], '-depsc')		;
 	print(gcf, [figname,'.png'], '-dpng')		;
 	print(gcf, [figname,'.jpg'], '-djpg')		;
 	print(gcf, [figname,'.pdf'], '-dpdf')		;
@@ -324,50 +356,99 @@ for ctr = 1:ColoursToDisplay
 	end
 end
 
-% Check for duplicates or near-duplicates by calculating the DEs between all possible pairs.
-% Investigate the pairs with the smallest DEs, to see how easily distinguishable they are.
-% First, convert the Munsell specifications to CIE xyY coordinates.  To reduce runtime,
-% save the xyY coordinates once they are found, and reload them in subsequent runs, 
-% to avoid recalculation.
-SavedxyYFile = [NameForOutput,'xyY.mat']	;
-if ~isempty(which(SavedxyYFile))
-    load(SavedxyYFile)	;
-else
-	xyY = [] 	;	% List of CIE xyY coordinates that correspond to Munsell inputs
-	for ctr = 1:NumOfColours
-		[x y Y Status] = MunsellToxyY(MunsellList{ctr});
-		xyY(ctr,:) = [x y Y]	;
+% Save the sorted chromas of the samples in a text file, for easy reference
+ChromaFileName  = [NameForOutput,'SortedChromas.txt']	;
+NumberOfSamples = size(SortedValues,1)					;
+Chromafid       = fopen(ChromaFileName, 'w')				;
+for ctr = 1:NumberOfSamples
+    if exist('NameList')
+		OutputLine = sprintf('%s\t%s\t%4.2f', ...
+							NameList{SortedIndices(ctr)}, ...
+							MunsellList{SortedIndices(ctr)}, ...
+							SortedChromas(ctr))	;
+	else
+		OutputLine = sprintf('%s\t%4.2f', ...
+							MunsellList{SortedIndices(ctr)}, ...
+							SortedChromas(ctr))	;
 	end
-	save(SavedxyYFile, 'xyY')	;
+							
+	if ctr ~= NumberOfSamples	% Add a return character after each line except the last
+		fprintf(Chromafid, '%s\n', OutputLine)	;
+	else						% No return after last line, to avoid blank line at end of file
+		fprintf(Chromafid, '%s', OutputLine)	;
+	end							
 end
+fclose(Chromafid)	;
 
-% Then, calculate the DEs over all pairs.  As before, save off the pairs and DEs after
-% the first time they are calculated, and reload them on subsequent runs
-WhitePointXYZ = WhitePointWithYEqualTo100('C/2')	;
-SavedDEFile = [NameForOutput,'DEs.mat']	;
-if ~isempty(which(SavedDEFile))
-    load(SavedDEFile)	;
-else
-PairsAndDEs = []	;
-	for ctr1 = 1:(NumOfColours-1)
-		for ctr2 = (ctr1+1):NumOfColours
-			DE2000 = CIEDE2000ForxyY(xyY(ctr1,:), xyY(ctr2,:), WhitePointXYZ, [1 1 1])	;
-			PairsAndDEs = [PairsAndDEs; ctr1 ctr2 DE2000]	;
+if CheckForNearDuplicates
+	% Check for duplicates or near-duplicates by calculating the DEs between all possible pairs.
+	% Investigate the pairs with the smallest DEs, to see how easily distinguishable they are.
+	% First, convert the Munsell specifications to CIE xyY coordinates.  To reduce runtime,
+	% save the xyY coordinates once they are found, and reload them in subsequent runs, 
+	% to avoid recalculation.
+	SavedxyYFile = [NameForOutput,'xyY.mat']	;
+	if ~isempty(which(SavedxyYFile))
+		load(SavedxyYFile)	;
+	else
+		xyY = [] 	;	% List of CIE xyY coordinates that correspond to Munsell inputs
+		for ctr = 1:NumOfColours
+			[x y Y Status] = MunsellToxyY(MunsellList{ctr});
+			xyY(ctr,:) = [x y Y]	;
 		end
+		save(SavedxyYFile, 'xyY')	;
 	end
-	save(SavedDEFile,'PairsAndDEs')
-end
 
-% Sort the pairs from lowest DE to smallest.  Pairs with very small DEs are duplicates,
-% or nearly so.  Display them for further investigation.  
-SortedDEs = sortrows(PairsAndDEs, 3)	;
-disp(['Closest matches'])
-for ctr = 1:20
-    disp([num2str(ctr),'  ',NameList{SortedDEs(ctr,1)},', ',...
-          NameList{SortedDEs(ctr,2)},', ',num2str(SortedDEs(ctr,3)),'    ',...
-          MunsellList{SortedDEs(ctr,1)},', ',MunsellList{SortedDEs(ctr,2)}])
-end
+	% Then, calculate the DEs over all pairs.  As before, save off the pairs and DEs after
+	% the first time they are calculated, and reload them on subsequent runs
+	WhitePointXYZ = WhitePointWithYEqualTo100('C/2')	;
+	SavedDEFile = [NameForOutput,'DEs.mat']	;
+	if ~isempty(which(SavedDEFile))
+		load(SavedDEFile)	;
+	else
+		PairsAndDEs = []	;
+		for ctr1 = 1:(NumOfColours-1)
+			for ctr2 = (ctr1+1):NumOfColours
+				DE2000 = CIEDE2000ForxyY(xyY(ctr1,:), xyY(ctr2,:), WhitePointXYZ, [1 1 1])	;
+				PairsAndDEs = [PairsAndDEs; ctr1 ctr2 DE2000]	;
+			end
+		end
+		save(SavedDEFile,'PairsAndDEs')
+	end
 
+	% Sort the pairs from lowest DE to smallest.  Pairs with very small DEs are duplicates,
+	% or nearly so.  Display them for further investigation, and save them to a file  
+	SortedDEs = sortrows(PairsAndDEs, 3)	;
+	disp(['Closest matches'])
+	for ctr = 1:min(40,size(SortedDEs,1))
+		DisplayString = sprintf('%d\t%s\t%s\t%4.2f\t%s vs %s', ...
+								ctr, ...
+								NameList{SortedDEs(ctr,1)}, ...
+								NameList{SortedDEs(ctr,2)}, ...
+								SortedDEs(ctr,3), ...
+								MunsellList{SortedDEs(ctr,1)}, ...
+								MunsellList{SortedDEs(ctr,2)})	;
+		disp(DisplayString)						
+	end
+
+	% Save the list of DEs for all pairs in a text file, for easy reference
+	DEFileName    = [NameForOutput,'DEsForPairs.txt']	;
+	NumberOfPairs = size(PairsAndDEs,1)					;
+	DEfid         = fopen(DEFileName, 'w')				;
+	for ctr = 1:NumberOfPairs
+		OutputLine = sprintf('%s\t%s\t%4.2f\t%s\t%s', ...
+								NameList{SortedDEs(ctr,1)}, ...
+								NameList{SortedDEs(ctr,2)}, ...
+								SortedDEs(ctr,3), ...
+								MunsellList{SortedDEs(ctr,1)}, ...
+								MunsellList{SortedDEs(ctr,2)})	;
+		if ctr ~= NumberOfPairs		% Add a return character after each line except the last
+			fprintf(DEfid, '%s\n', OutputLine)	;
+		else						% No return after last line, to avoid blank line at end of file
+			fprintf(DEfid, '%s', OutputLine)	;
+		end							
+	end
+	fclose(DEfid)	;
+end
 
 if DisplayMunsellHueLeaves
 PageBoundaries = 0:10:100	;
@@ -645,7 +726,7 @@ for pagectr = 1:(length(PageBoundaries) - 1)
 				ChromaOffset = 0.0	;
 				for index = IndicesToPlot
 					hold on
-					if ~strcmp(NameList{index}, 'Dark7') & ...
+					if ~strcmp(NameList{index}, 'Dark7') && ...
 					   ~strcmp(NameList{index}, 'A43') 
 						text(MunsellChromasInList(index)+ChromaOffset, ...
 							 MunsellValuesInList(index)+ValueOffset, ...
@@ -669,9 +750,9 @@ for pagectr = 1:(length(PageBoundaries) - 1)
 				ChromaOffset = 0.0	;
 				for index = IndicesToPlot
 					hold on
-					if ~strcmp(NameList{index}, 'Dark16') & ...
-					   ~strcmp(NameList{index}, 'A49') & ...
-					   ~strcmp(NameList{index}, 'BG10') & ...
+					if ~strcmp(NameList{index}, 'Dark16') && ...
+					   ~strcmp(NameList{index}, 'A49') && ...
+					   ~strcmp(NameList{index}, 'BG10') && ...
 					   ~strcmp(NameList{index}, 'T5') 
 						text(MunsellChromasInList(index)+ChromaOffset, ...
 							 MunsellValuesInList(index)+ValueOffset, ...
@@ -703,7 +784,7 @@ for pagectr = 1:(length(PageBoundaries) - 1)
 				for index = IndicesToPlot
 % disp([NameList{index},'  ',num2str(MunsellValuesInList(index)),'/',num2str(MunsellChromasInList(index))])
 					hold on
-					if ~strcmp(NameList{index}, 'BV7') & ...
+					if ~strcmp(NameList{index}, 'BV7') && ...
 					   ~strcmp(NameList{index}, 'A1') 
 						text(MunsellChromasInList(index)+ChromaOffset, ...
 							 MunsellValuesInList(index)+ValueOffset, ...
@@ -727,12 +808,12 @@ for pagectr = 1:(length(PageBoundaries) - 1)
 				ChromaOffset = 0.0	;
 				for index = IndicesToPlot
 					hold on
-					if ~strcmp(NameList{index}, 'BE8') & ...
-					   ~strcmp(NameList{index}, 'BE26') & ...
-					   ~strcmp(NameList{index}, 'A17') & ...
-					   ~strcmp(NameList{index}, 'R10') & ...
-					   ~strcmp(NameList{index}, 'J2') & ...
-					   ~strcmp(NameList{index}, 'J3') & ...
+					if ~strcmp(NameList{index}, 'BE8') && ...
+					   ~strcmp(NameList{index}, 'BE26') && ...
+					   ~strcmp(NameList{index}, 'A17') && ...
+					   ~strcmp(NameList{index}, 'R10') && ...
+					   ~strcmp(NameList{index}, 'J2') && ...
+					   ~strcmp(NameList{index}, 'J3') && ...
 					   ~strcmp(NameList{index}, 'J4') 
 						text(MunsellChromasInList(index)+ChromaOffset, ...
 							 MunsellValuesInList(index)+ValueOffset, ...
@@ -747,12 +828,12 @@ for pagectr = 1:(length(PageBoundaries) - 1)
 				ChromaOffset = 0.0	;
 				for index = IndicesToPlot
 					hold on
-					if ~strcmp(NameList{index}, 'BE8') & ...
-					   ~strcmp(NameList{index}, 'BE26') & ...
-					   ~strcmp(NameList{index}, 'A17') & ...
-					   ~strcmp(NameList{index}, 'R10') & ...
-					   ~strcmp(NameList{index}, 'J2') & ...
-					   ~strcmp(NameList{index}, 'J3') & ...
+					if ~strcmp(NameList{index}, 'BE8') && ...
+					   ~strcmp(NameList{index}, 'BE26') && ...
+					   ~strcmp(NameList{index}, 'A17') && ...
+					   ~strcmp(NameList{index}, 'R10') && ...
+					   ~strcmp(NameList{index}, 'J2') && ...
+					   ~strcmp(NameList{index}, 'J3') && ...
 					   ~strcmp(NameList{index}, 'J4') 
 						text(MunsellChromasInList(index)+ChromaOffset, ...
 							 MunsellValuesInList(index)+ValueOffset, ...
@@ -795,7 +876,7 @@ for pagectr = 1:(length(PageBoundaries) - 1)
     
 	figname = [NameForOutput,'MunsellPage',num2str(pagectr)]	;
 	set(gcf, 'Name', figname)
-	print(gcf, [figname,'.eps'], '-deps')		;
+	print(gcf, [figname,'.eps'], '-depsc')		;
 	print(gcf, [figname,'.png'], '-dpng')		;
 	print(gcf, [figname,'.jpg'], '-djpg')		;
 	print(gcf, [figname,'.pdf'], '-dpdf')		;

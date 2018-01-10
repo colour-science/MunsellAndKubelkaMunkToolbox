@@ -36,19 +36,15 @@ function [x, y, YOut] = XYZ2xyY(X, YIn, Z);
 %
 % Syntax		[x, y, YOut] = XYZ2xyY(X, YIn, Z);
 %
-%				X, Yin, Z		XYZ coordinates for an input colour
+%				X, Yin, Z		vectors or matrices of XYZ coordinates for an input colour
 %
-%				x, y, Yout		xyY coordinates for the input colour
-%
-% Related		xyY2XYZ
-% Functions
-%
-% Required		None
-% Functions		
+%				x, y, Yout		vectors or matrices of xyY coordinates for the input colour
 %
 % Author		Paul Centore (May 18, 2012)
+% Revision		Paul Centore (December 3, 2016)
+%				-----Generalized routine to handle vector inputs as well as scalar
 %
-% Copyright 2012 Paul Centore
+% Copyright 2012, 2016 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %
@@ -65,13 +61,22 @@ function [x, y, YOut] = XYZ2xyY(X, YIn, Z);
 %    You should have received a copy of the GNU General Public License
 %    along with MunsellAndKubelkaMunkToolbox.  If not, see <http://www.gnu.org/licenses/>.
 
-if YIn == 0.0			% Check for stimulus function with zero power, or zero reflectance
-   x    = 0.0			;
-   y    = 0.0			;
-   YOut = YIn			;
-else
-   x    = X  /(X+YIn+Z)	;
-   y    = YIn/(X+YIn+Z)	;
-   YOut = YIn			;
-end
-return; 
+% Check for stimulus function with zero power, or zero reflectance
+ZeroPowerIndices = find(YIn == 0)	;
+x(ZeroPowerIndices) = 0	;
+y(ZeroPowerIndices) = 0	;
+
+% Evaluate cases where power or reflectance is not zero
+NonZPIndices = find(YIn ~= 0)	;
+x(NonZPIndices) = X(NonZPIndices)  ./(X(NonZPIndices)+YIn(NonZPIndices)+Z(NonZPIndices))	;
+y(NonZPIndices) = YIn(NonZPIndices)./(X(NonZPIndices)+YIn(NonZPIndices)+Z(NonZPIndices))	;
+
+% The luminance (Y) stays the same, regardless of whether or not Y is 0
+YOut = YIn	;
+
+% Reshape the outputs so that they have the same shape as the inputs, e.g. row vectors
+% are output when row vectors are input, and column vectors are output when column 
+% vectors are input
+x    = reshape(x,size(X,1),size(X,2))		;
+y    = reshape(y,size(X,1),size(X,2))		;
+YOut = reshape(YOut,size(X,1),size(X,2))	;

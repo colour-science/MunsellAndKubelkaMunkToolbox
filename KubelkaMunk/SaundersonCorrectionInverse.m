@@ -34,7 +34,7 @@ function R_Inf = SaundersonCorrectionInverse(R_m, K1, K2);
 % Syntax		R_Inf = SaundersonCorrectionInverse(R_m, K1, K2);
 %
 %				R_m		The reflectance, as a ratio between 0 and 1, of a masstone of a paint or
-%						ink.  R has the same size as R_Inf, and can be a scalar or a vector.  R_m
+%						ink.  R_m has the same size as R_Inf, and can be a matrix, scalar or vector.  R_m
 %						is the reflectance value that a spectrophotometer would measure.
 %
 %				R_Inf	The bulk reflectance, as a ratio between 0 and 1, of a masstone 
@@ -58,8 +58,10 @@ function R_Inf = SaundersonCorrectionInverse(R_m, K1, K2);
 % Author		Paul Centore (July 28, 2013)
 % Revised		Paul Centore (October 30, 2013)
 %				--Used elementwise operations consistently in formula
+% Revised		Paul Centore (January 5, 2015)
+%				--Minor revisions to documentations
 %
-% Copyright 2013 Paul Centore
+% Copyright 2013, 2015 Paul Centore
 %
 %    This file is part of MunsellAndKubelkaMunkToolbox.
 %

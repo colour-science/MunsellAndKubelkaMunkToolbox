@@ -249,7 +249,7 @@ end
 TRUE  = 1;
 FALSE = 0;	
 % Set ShowFigure to TRUE if a figure is desired for debugging
-ShowFigure = FALSE	;
+ShowFigure = false	;
 if ShowFigure == TRUE
    figure	;
 end
@@ -268,10 +268,11 @@ end
 % point with Munsell value corresponding to Y.
 [xcenter ycenter Ytemp StatusCode] = MunsellToxyY([MunsellValue])	;
 if StatusCode.ind ~= 1
-   Status.ind  = 2;
-   Status.dist = -99;
-   Status.num  = -99;
-   return		 
+%    disp(['Status 2, line 271'])		    
+    Status.ind  = 2;
+    Status.dist = -99;
+    Status.num  = -99;
+    return		 
 end
 % rInput and thetaInput are the values the inversion algorithm will attempt to match
 [thetaInput rInput] = cart2pol(x-xcenter, y-ycenter);
@@ -360,8 +361,6 @@ while NumOfTries <= MaxNumOfTries
    % After adjusting chroma without adjusting hue, the next iteration adjusts hue
    % without adjusting chroma.
    NumOfTries = NumOfTries + 1;
-%[xtmop ytmop Ytmop StstTmop] = MunsellToxyY(CurrentCLVec);
-%[CurrentCLVec, xtmop ytmop]
 
    % Extract Munsell quantities from Munsell specification
    CurrentCLHueNumber       = CurrentCLVec(1);
@@ -381,6 +380,7 @@ while NumOfTries <= MaxNumOfTries
 
    [xCur yCur YCur StatusCode] = MunsellToxyY(CurrentCLVec);
    if StatusCode.ind ~= 1
+%	  disp(['Status 2, line 383'])		    
 	  Status.ind  = 2;
       Status.dist = EuclideanDifference;
       Status.num  = NumOfTries;
@@ -394,7 +394,6 @@ while NumOfTries <= MaxNumOfTries
    % Make a list, thetaDiffsVec, of the corresponding theta differences.  
    [thetaCur rCur] = cart2pol(xCur-xcenter, yCur-ycenter);
    thetaCur        = mod((180/pi)*thetaCur, 360)		 ;		% Express in degrees
-%FirstTD = [rCur, thetaCur xCur yCur]
    thetaDiff       = mod(360 - thetaInput + thetaCur, 360);
    if thetaDiff > 180		% Adjust for wraparound if necessary
       thetaDiff = thetaDiff-360		;
@@ -402,7 +401,7 @@ while NumOfTries <= MaxNumOfTries
    thetaDiffsVec = [thetaDiff]	;
    % Start a similar list for hue angles that correspond to the theta differences.
    ChromDiagHueAngles       = [CurrentChromDiagHueAngle]	;
-   % Also make a list of much the new hue angles differ from CurrentChromDiagHueAngle.  These
+   % Also make a list of how much the new hue angles differ from CurrentChromDiagHueAngle.  These
    % angles will be near zero, and will avoid potential problems with wraparound.
    ChromDiagHueAngleDiffs   = [0];
 
@@ -415,7 +414,6 @@ while NumOfTries <= MaxNumOfTries
    AttemptExtrapolation = FALSE;
    while sign(min(thetaDiffsVec)) == sign(max(thetaDiffsVec))  && AttemptExtrapolation == FALSE
       ctr = ctr + 1;
-
 	  if ctr > 10	% Too many attempts.  Return with error message
 		 Status.ind = 3		;
 		 return;
@@ -429,10 +427,9 @@ while NumOfTries <= MaxNumOfTries
 	  if TempChromDiagHueAngleDiff > 180
 	     TempChromDiagHueAngleDiff = TempChromDiagHueAngleDiff - 360;
 	  end
-%Tvar = [ctr CurrentChromDiagHueAngle thetaInput thetaCur TempChromDiagHueAngle]
       [TempHueNumber,TempHueLetterCode] = ChromDiagHueAngleToMunsellHue(TempChromDiagHueAngle);
       TempCLVec       = [TempHueNumber, MunsellValue, CurrentMunsellChroma, TempHueLetterCode];
-	  
+
 	  % Evaluate the trial Munsell specification, convert to polar coordinates, and 
 	  % calculate the difference of the resulting trial theta and thetaInput
       [xCurTemp yCurTemp YCurTemp StatusCode] = MunsellToxyY(TempCLVec);
@@ -442,6 +439,7 @@ while NumOfTries <= MaxNumOfTries
 	     if length(thetaDiffsVec) >= 2	
 		    AttemptExtrapolation = TRUE	;
 		 else
+%			disp(['Status 2, line 442'])		    
   		    Status.ind  = 2;
             Status.dist = EuclideanDifference;
             Status.num  = NumOfTries;
@@ -456,7 +454,6 @@ while NumOfTries <= MaxNumOfTries
          if thetaDiff > 180		% Adjust for wraparound if necessary
             thetaDiff = thetaDiff-360		;
          end
-%DiffVar = [thetaDiff thetaInput thetaCurTemp TempChromDiagHueAngle rCurTemp]
 
 	     % Add trial hue angle and theta difference to lists
          thetaDiffsVec          = [thetaDiffsVec, thetaDiff]				;	
@@ -466,7 +463,7 @@ while NumOfTries <= MaxNumOfTries
    end
    
    % Since the while loop exited successfully, both negative and positive theta
-   % differences have been found, or an extrapolation should
+   % differences have been found, so an extrapolation should
    % be attempted.  Interpolate linearly to estimate the hue
    % angle that corresponds to a theta difference of 0
    [thetaDiffsVecSort I]  = sort(thetaDiffsVec)		;
@@ -482,11 +479,11 @@ while NumOfTries <= MaxNumOfTries
    [NewHueNumber,NewHueLetterCode] = ChromDiagHueAngleToMunsellHue(NewChromDiagHueAngle);
    CurrentCLVec       = [NewHueNumber, MunsellValue, CurrentMunsellChroma, NewHueLetterCode];
 if NumOfTries >= 2000 	% Use for debugging non-converging cases
- NumOfTries
- thetaDiffsVecSort
- ChromDiagHueAngleDiffs
- ChromDiagHueAnglesSort
- NewChromDiagHueAngle
+	NumOfTries
+	thetaDiffsVecSort
+	ChromDiagHueAngleDiffs
+	ChromDiagHueAnglesSort
+	NewChromDiagHueAngle
     [ctr CurrentCLVec]
 end
 
@@ -494,6 +491,10 @@ end
    % constructed Munsell specification, and the input xy
    [xCur yCur YCur StatusCode] = MunsellToxyY(CurrentCLVec);
    if StatusCode.ind ~= 1
+%	  disp(['Status 2, line 494'])		    
+%	  CurrentCLVec
+%	  [xCur yCur YCur]
+%	  StatusCode
 	  Status.ind  = 2;
       Status.dist = EuclideanDifference;
       Status.num  = NumOfTries;
@@ -538,6 +539,7 @@ end
    % Find xy coordinates corresponding to the current Munsell specification.
    [xCur yCur YCur StatusCode] = MunsellToxyY(CurrentCLVec);
    if StatusCode.ind ~= 1
+%	  disp(['Status 2, line 542'])		    
 	  Status.ind  = 2;
       Status.dist = EuclideanDifference;
       Status.num  = NumOfTries;
@@ -583,6 +585,7 @@ end
 	  TempCLVec         = [CurrentCLHueNumber, MunsellValue, TempMunsellChroma, CurrentCLHueLetterIndex];
       [xCurTemp yCurTemp YCurTemp StatusCode] = MunsellToxyY(TempCLVec);
 	  if StatusCode.ind ~= 1
+%disp(['Status 2, line 597'])		    
 		 Status.ind  = 2;
          Status.dist = EuclideanDifference;
          Status.num  = NumOfTries;
@@ -623,6 +626,7 @@ end
    [xCur yCur YCur StatusCode] = MunsellToxyY(CurrentCLVec);
 
    if StatusCode.ind ~= 1
+%disp(['Status 2, line 636'])		    
 	  Status.ind  = 2;
       Status.dist = EuclideanDifference;
 	  Status.num  = NumOfTries;
