@@ -93,11 +93,11 @@ Status.Messages = {'Success',...
 				   };
 				
 % Check for valid inputs
-if Value < 1 | Value > 9
+if Value < 1 || Value > 9
    Status.ind = 2;		% Set error and return
    return
 end
-if HuePrefix < 0 | HuePrefix > 10
+if HuePrefix < 0 || HuePrefix > 10
    Status.ind = 3;		% Set error and return
    return
 end

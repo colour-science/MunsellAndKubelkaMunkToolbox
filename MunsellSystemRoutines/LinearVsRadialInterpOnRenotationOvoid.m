@@ -174,7 +174,7 @@ if Chroma == 0
 end
 
 % Check that the Munsell value of the input is an integer between 1 and 10
-if Value < 1 | Value > 10
+if Value < 1 || Value > 10
    Status.ind = 2;		% Set error and return
    return
 end
